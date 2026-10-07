@@ -7,6 +7,8 @@
   --text: #f4f4f5;
   --muted: #9b9ba3;
   --hot: #f5f5f5;
+  --scene-color: rgb(222 222 227);
+  --scene-color-soft: rgba(222, 222, 227, .28);
 }
 * { box-sizing: border-box; }
 html, body { margin:0; min-height:100%; background: radial-gradient(circle at 50% -20%, #232329 0, #0b0b0e 40%, #050506 100%); color:var(--text); }
@@ -38,9 +40,9 @@ video { width:100%; height:100%; object-fit:contain; background:#000; }
 .controls { padding:0 20px 18px; background:linear-gradient(0deg, #0a0a0c, #09090b); }
 .timeline-wrap { position:relative; height:36px; display:flex; align-items:center; }
 .living-track { position:absolute; left:2px; right:2px; height:5px; border-radius:99px; background:#242429; overflow:visible; transition:transform .22s ease, filter .22s ease; }
-.past { height:100%; width:0; background:#dedee3; border-radius:99px; transition:width .12s linear; }
+.past { height:100%; width:0; background:linear-gradient(90deg, #dedee3 0%, var(--scene-color) 100%); border-radius:99px; transition:width .12s linear, background .5s ease; }
 .pulse { position:absolute; inset:-7px 0; background:linear-gradient(90deg, transparent 0 65%, rgba(255,255,255,.15) 74%, transparent 86%); opacity:.1; transform:translateX(-25%); transition:opacity .15s; }
-.presence-dot { position:absolute; top:50%; left:0; width:11px; height:11px; border-radius:50%; background:#fff; transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(255,255,255,.08), 0 0 24px rgba(255,255,255,.35); transition:left .12s linear, transform .16s ease; }
+.presence-dot { position:absolute; top:50%; left:0; width:11px; height:11px; border-radius:50%; background:var(--scene-color); transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(255,255,255,.08), 0 0 24px var(--scene-color-soft); transition:left .12s linear, transform .16s ease, background .5s ease, box-shadow .5s ease; }
 .seek { position:absolute; inset:0; width:100%; opacity:0; cursor:ew-resize; }
 .control-row { display:grid; grid-template-columns:auto auto 1fr auto auto auto; gap:12px; align-items:center; }
 .icon-button, .soft-button, .close-button { border:0; background:transparent; cursor:pointer; border-radius:9px; }
