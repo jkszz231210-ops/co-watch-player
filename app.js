@@ -284,7 +284,9 @@ function initAudio() {
 
 async function togglePlayback(requestedByUser = true) {
   if (!video.src) return fileInput.click();
-  if (requestedByUser && !video.paused) observeUserResponse('pause-request', { at: video.currentTime });
+  const rejectedPending = requestedByUser && !video.paused
+    ? observeUserResponse('pause-request', { at: video.currentTime })
+    : false;
   initAudio();
   if (audioContext?.state === 'suspended') await audioContext.resume();
 
@@ -300,7 +302,7 @@ async function togglePlayback(requestedByUser = true) {
   }
 
   const chance = Number(autonomy.value) / 100 * .32;
-  if (requestedByUser && allowPauseFight.checked && !interlude && Math.random() < chance) {
+  if (requestedByUser && !rejectedPending && allowPauseFight.checked && !interlude && Math.random() < chance) {
     video.pause();
     playBtn.textContent = '▶';
     say(pick(['等一下。', '这里再看一点。', '先别停。', '就几秒。']));
@@ -577,7 +579,7 @@ seek.addEventListener('change', () => {
   if (!video.duration) return;
   const userSeekFrom = seekStartedAt;
   const userSeekTo = video.currentTime;
-  observeUserResponse('seek', { from: userSeekFrom, to: userSeekTo });
+  const rejectedPending = observeUserResponse('seek', { from: userSeekFrom, to: userSeekTo });
   memory.seeks += 1;
   if (seekStartedAt !== null && seekStartedAt - video.currentTime > 3) {
     bumpHotspot('replay', video.currentTime);
@@ -586,7 +588,7 @@ seek.addEventListener('change', () => {
   persistMemory();
   lastInteractionAt = Date.now();
 
-  if (allowTime.checked) {
+  if (allowTime.checked && !rejectedPending) {
     const a = Number(autonomy.value) / 100;
     if (Math.random() < a * .42) {
       const reaction = (Math.random() < .7 ? -1 : 1) * (1.5 + Math.random() * 5.5) * a;
@@ -822,9 +824,9 @@ function beginFeedbackWindow(action, reason, context = {}) {
 }
 
 function observeUserResponse(kind, detail = {}) {
-  if (!pendingFeedback) return;
+  if (!pendingFeedback) return false;
   const age = Date.now() - pendingFeedback.at;
-  if (age > 6500) return;
+  if (age > 6500) return false;
 
   const action = pendingFeedback.action;
   let rejected = false;
@@ -853,7 +855,11 @@ function observeUserResponse(kind, detail = {}) {
     why = 'user-left-cross-video';
   }
 
-  if (rejected) resolveFeedback('resisted', why);
+  if (rejected) {
+    resolveFeedback('resisted', why);
+    return true;
+  }
+  return false;
 }
 
 function resolveFeedback(outcome, why) {
