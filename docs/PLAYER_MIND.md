@@ -125,3 +125,105 @@ coWatchDebug.memory
 - Mood 惯性
 - 行为后果反馈
 - 用户对它行为的“接受 / 抵抗”学习
+
+
+## v0.2：行为后果反馈
+
+每次越界后都会开启约 5 秒的反馈观察窗口。
+
+目前识别的“拒绝”包括：
+
+- 它把时间拉回去后，用户迅速把进度拖回原位置
+- 它拒绝暂停 / 主动停留后，用户再次明确要求暂停
+- 它串去另一视频后，用户立即选择别的视频或用进度操作离开
+
+如果用户没有立刻纠正，则视作一次“默许”。
+
+反馈会改变：
+
+- `feedback.score`
+- `socialConfidence`
+- `tension`
+- 下一次行为的执行概率
+- 克制型人格的退让时长
+- 执拗型人格被拒绝后的欲望强度
+
+## Personality
+
+每个安装实例第一次运行时生成一组长期保存在 localStorage 的性格参数：
+
+- `stubbornness`：执拗
+- `deference`：克制 / 尊重用户
+- `curiosityBias`：好奇倾向
+- `wanderlust`：跨视频游荡倾向
+
+最高的特征会得到一个可读标签：
+
+- 执拗
+- 克制
+- 好奇
+- 游荡
+
+这不是四选一职业。四项数值同时存在。
+
+### 被拒绝以后
+
+高执拗：
+
+```text
+用户拒绝
+  ↓
+tension 上升
+  ↓
+rewatch / linger 欲望上升
+  ↓
+后面更可能再次表达自己的意见
+```
+
+偏克制：
+
+```text
+用户拒绝
+  ↓
+进入 restrainedUntil
+  ↓
+一段时间里行为执行概率大幅降低
+  ↓
+“好。你来。”
+```
+
+## Mood 惯性
+
+Mood 现在必须持续满足新状态约 1.8 秒才会真正切换。
+
+这避免了数值在阈值附近抖动时出现：
+
+```text
+专注 -> 安静 -> 专注 -> 安静
+```
+
+这种“情绪闪烁”。
+
+## 调试 v0.2
+
+```js
+coWatchDebug.mind
+coWatchDebug.memory.feedback
+coWatchDebug.memory.feedbackLog
+coWatchDebug.memory.personality
+coWatchDebug.getPendingFeedback()
+
+coWatchDebug.force('rewind')
+coWatchDebug.force('hold')
+coWatchDebug.force('rate')
+coWatchDebug.force('cross')
+
+coWatchDebug.setPersonality({
+  stubbornness: 1,
+  deference: 0
+})
+
+coWatchDebug.resetFeedback()
+```
+
+这些接口专门用于现阶段测试，正式桌面版本不会把它们当产品 API。
