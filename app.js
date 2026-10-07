@@ -68,6 +68,23 @@ const perception = {
   userPauseHeat: 0,
 };
 
+const mind = {
+  mood: '安静',
+  arousal: .12,
+  curiosity: .18,
+  impatience: .08,
+  attachment: 0,
+  desires: {
+    rewatch: .08,
+    linger: .08,
+    accelerate: .05,
+    wander: .03,
+    silence: .76,
+  },
+  lastDecision: null,
+  lastMoodChangedAt: Date.now(),
+};
+
 const memory = migrateMemory(loadMemory());
 updateMemoryUI();
 
@@ -137,7 +154,7 @@ function updateMemoryUI() {
   relationFill.style.width = `${Math.max(4, intimacy)}%`;
   relationLabel.textContent = intimacy < 18 ? '陌生' : intimacy < 42 ? '试探' : intimacy < 68 ? '熟悉' : intimacy < 88 ? '默契' : '共生';
   const last = memory.interventionLog?.[0];
-  memoryBox.innerHTML = `共同观看：<b>${formatLong(memory.watchSeconds)}</b><br>你主动拖动：${memory.seeks} 次<br>你请求暂停：${memory.pauses} 次<br>它越界：${memory.interventions} 次${last ? `<br>最近一次内部原因：<span style="opacity:.82">${escapeHtml(last.reason)}</span>` : ''}<br><span style="opacity:.65">这些数据只存在当前浏览器的 localStorage。</span>`;
+  memoryBox.innerHTML = `共同观看：<b>${formatLong(memory.watchSeconds)}</b><br>你主动拖动：${memory.seeks} 次<br>你请求暂停：${memory.pauses} 次<br>它越界：${memory.interventions} 次<br>当前状态：<b>${escapeHtml(mind.mood)}</b>${last ? `<br>最近一次内部原因：<span style="opacity:.82">${escapeHtml(last.reason)}</span>` : ''}<br><span style="opacity:.65">这些数据只存在当前浏览器的 localStorage。</span>`;
 }
 
 function escapeHtml(value) {
@@ -384,51 +401,104 @@ function sampleSubtitleDensity() {
   }
 }
 
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function easeToward(current, target, speed) {
+  return current + (target - current) * speed;
+}
+
+function updateMind() {
+  if (!video.src) return;
+
+  const attachmentTarget = clamp01(
+    Math.log2(1 + memory.watchSeconds / 90) * .12 +
+    Math.min(.28, memory.interventions * .008)
+  );
+
+  const arousalTarget = clamp01(
+    perception.loudness * .44 +
+    perception.motionIntensity * .46 +
+    (perception.sceneCut ? .18 : 0) +
+    (perception.audioSpike ? .16 : 0)
+  );
+
+  const curiosityTarget = clamp01(
+    perception.visualDelta * 1.35 +
+    perception.subtitleDensity * .22 +
+    Math.min(.34, perception.userReplayHeat * .11) +
+    Math.min(.24, perception.userPauseHeat * .08) +
+    (perception.sceneCut ? .2 : 0) +
+    (perception.audioSpike ? .13 : 0)
+  );
+
+  const quietness = clamp01(1 - perception.loudness);
+  const stillness = clamp01(1 - perception.motionIntensity);
+  const impatienceTarget = clamp01(
+    quietness * .24 +
+    stillness * .2 +
+    Math.min(.38, perception.silenceMs / 9000) -
+    perception.subtitleDensity * .18 -
+    curiosityTarget * .16
+  );
+
+  mind.arousal = easeToward(mind.arousal, arousalTarget, .035);
+  mind.curiosity = easeToward(mind.curiosity, curiosityTarget, .028);
+  mind.impatience = easeToward(mind.impatience, impatienceTarget, .018);
+  mind.attachment = easeToward(mind.attachment, attachmentTarget, .012);
+
+  const rewatch = clamp01(
+    mind.curiosity * .52 +
+    mind.arousal * .16 +
+    Math.min(.45, perception.userReplayHeat * .14) +
+    (perception.sceneCut ? .16 : 0) +
+    (perception.audioSpike ? .13 : 0)
+  );
+  const linger = clamp01(
+    mind.curiosity * .3 +
+    mind.attachment * .18 +
+    perception.subtitleDensity * .32 +
+    Math.min(.44, perception.userPauseHeat * .15)
+  );
+  const accelerate = clamp01(
+    mind.impatience * .72 +
+    Math.min(.24, perception.silenceMs / 12000) -
+    mind.curiosity * .18
+  );
+  const wander = clamp01(
+    mind.curiosity * .24 +
+    mind.impatience * .23 +
+    mind.attachment * .24 +
+    (files.length > 1 ? .08 : 0)
+  );
+  const strongest = Math.max(rewatch, linger, accelerate, allowCrossVideo.checked ? wander : 0);
+
+  mind.desires.rewatch = easeToward(mind.desires.rewatch, rewatch, .06);
+  mind.desires.linger = easeToward(mind.desires.linger, linger, .06);
+  mind.desires.accelerate = easeToward(mind.desires.accelerate, accelerate, .055);
+  mind.desires.wander = easeToward(mind.desires.wander, wander, .045);
+  mind.desires.silence = easeToward(mind.desires.silence, clamp01(1 - strongest * .92), .07);
+
+  let nextMood = '安静';
+  if (mind.curiosity > .56 && mind.arousal > .5) nextMood = '着迷';
+  else if (mind.arousal > .57) nextMood = '躁动';
+  else if (mind.curiosity > .44) nextMood = '专注';
+  else if (mind.impatience > .48) nextMood = '游离';
+
+  if (nextMood !== mind.mood) {
+    mind.mood = nextMood;
+    mind.lastMoodChangedAt = Date.now();
+    updateMemoryUI();
+  }
+
+  // 事件被吸收到 Mind 后不应在每个动画帧重复叠加。
+  perception.sceneCut = false;
+  perception.audioSpike = false;
+}
+
 function evaluatePerception() {
-  if (!video.src || video.paused || video.ended || interlude) return;
-  const now = Date.now();
-  const a = Number(autonomy.value) / 100;
-  if (a <= 0 || now - lastInterventionAt < 9000 || now - lastInteractionAt < 2200 || now - lastPerceptionDecisionAt < 1600) return;
-
-  const bucket = timeBucket();
-  const hotspotKey = `${currentMediaKey()}::${bucket}`;
-
-  if (perception.userReplayHeat >= 2 && hotspotKey !== lastHotspotTriggerKey && allowTime.checked && Math.random() < .32 + a * .42) {
-    lastHotspotTriggerKey = hotspotKey;
-    lastPerceptionDecisionAt = now;
-    interventionRewind('你以前总在这里回头。', 'memory:replay-hotspot');
-    return;
-  }
-
-  if (perception.userPauseHeat >= 2 && hotspotKey !== lastHotspotTriggerKey && allowPauseFight.checked && Math.random() < .22 + a * .35) {
-    lastHotspotTriggerKey = hotspotKey;
-    lastPerceptionDecisionAt = now;
-    interventionHold('你以前常停在这里。', 'memory:pause-hotspot', 1100);
-    return;
-  }
-
-  if (perception.audioSpike && allowTime.checked && video.currentTime > 4 && Math.random() < .24 + a * .35) {
-    lastPerceptionDecisionAt = now;
-    interventionRewind('刚才声音突然变了。', 'perception:audio-spike', 2.4);
-    return;
-  }
-
-  if (perception.sceneCut && allowTime.checked && video.currentTime > 4 && Math.random() < .2 + a * .3) {
-    lastPerceptionDecisionAt = now;
-    interventionRewind('这个切换，我想再看一眼。', 'perception:scene-cut', 1.8);
-    return;
-  }
-
-  if (perception.motionIntensity > .42 && perception.loudness > .22 && allowTime.checked && Math.random() < .018 + a * .035) {
-    lastPerceptionDecisionAt = now;
-    interventionRate('这一段太快了。', 'perception:high-motion', .9);
-    return;
-  }
-
-  if (perception.silenceMs > 3200 && allowTime.checked && Math.random() < .012 + a * .018) {
-    lastPerceptionDecisionAt = now;
-    interventionRate('安静太久了。', 'perception:sustained-silence', 1.08);
-  }
+  updateMind();
 }
 
 function animationLoop() {
@@ -477,29 +547,73 @@ seek.addEventListener('change', () => {
 
 function autonomousTick(force = false) {
   if (!video.src || video.paused || video.ended || interlude) return;
+
   const now = Date.now();
   const a = Number(autonomy.value) / 100;
   if (!force && (now - lastInterventionAt < 12000 || now - lastInteractionAt < 2500)) return;
-  if (!force && Math.random() > .035 * a) return;
 
-  const choices = [];
-  if (allowTime.checked && video.currentTime > 8) choices.push('rewind', 'nudge', 'rate');
-  if (allowPauseFight.checked) choices.push('hold');
-  if (allowCrossVideo.checked && files.length > 1) choices.push('cross');
-  if (!choices.length) return;
+  const candidates = [];
+  if (allowTime.checked && video.currentTime > 5) {
+    candidates.push({ desire: 'rewatch', weight: mind.desires.rewatch, action: 'rewind' });
+    candidates.push({ desire: 'accelerate', weight: mind.desires.accelerate, action: 'rate' });
+  }
+  if (allowPauseFight.checked) {
+    candidates.push({ desire: 'linger', weight: mind.desires.linger, action: 'hold' });
+  }
+  if (allowCrossVideo.checked && files.length > 1) {
+    candidates.push({ desire: 'wander', weight: mind.desires.wander, action: 'cross' });
+  }
+  candidates.push({ desire: 'silence', weight: mind.desires.silence * .82, action: 'silence' });
 
-  const choice = force ? choices[Math.floor(Math.random() * choices.length)] : weightedChoice(choices);
-  if (choice === 'rewind') interventionRewind();
-  if (choice === 'nudge') interventionNudge();
-  if (choice === 'rate') interventionRate();
-  if (choice === 'hold') interventionHold();
-  if (choice === 'cross') interventionCrossVideo();
+  const urge = Math.max(...candidates.filter(c => c.action !== 'silence').map(c => c.weight), 0);
+  const executeChance = .006 + urge * a * .055;
+  if (!force && Math.random() > executeChance) return;
+
+  let selected;
+  if (force) {
+    selected = candidates
+      .filter(c => c.action !== 'silence')
+      .sort((x, y) => y.weight - x.weight)[0];
+  } else {
+    selected = chooseWeighted(candidates);
+  }
+  if (!selected || selected.action === 'silence') {
+    mind.lastDecision = { at: now, mood: mind.mood, desire: 'silence', action: 'none' };
+    return;
+  }
+
+  mind.lastDecision = {
+    at: now,
+    mood: mind.mood,
+    desire: selected.desire,
+    action: selected.action,
+    weight: Number(selected.weight.toFixed(3)),
+  };
+
+  const reason = `mind:${mind.mood}:${selected.desire}`;
+  if (selected.action === 'rewind') {
+    interventionRewind(mind.mood === '着迷' ? '这个，我还想看一遍。' : null, reason);
+  }
+  if (selected.action === 'rate') {
+    interventionRate(mind.mood === '游离' ? '这里有点拖。' : null, reason, mind.impatience > .6 ? 1.14 : 1.08);
+  }
+  if (selected.action === 'hold') {
+    interventionHold(mind.mood === '专注' ? '先留在这里。' : null, reason, 900 + mind.curiosity * 900);
+  }
+  if (selected.action === 'cross') {
+    interventionCrossVideo(reason);
+  }
 }
 setInterval(() => autonomousTick(false), 1000);
 
-function weightedChoice(choices) {
-  if (allowCrossVideo.checked && files.length > 1 && Math.random() < .14) return 'cross';
-  return pick(choices);
+function chooseWeighted(items) {
+  const total = items.reduce((sum, item) => sum + Math.max(.001, item.weight), 0);
+  let cursor = Math.random() * total;
+  for (const item of items) {
+    cursor -= Math.max(.001, item.weight);
+    if (cursor <= 0) return item;
+  }
+  return items[items.length - 1];
 }
 
 function interventionRewind(message = null, reason = 'random:rewind', fixedSeconds = null) {
@@ -535,7 +649,7 @@ function interventionHold(message = null, reason = 'random:hold', duration = nul
   setTimeout(() => video.play().catch(() => {}), duration ?? (650 + Math.random() * 850));
 }
 
-function interventionCrossVideo() {
+function interventionCrossVideo(reason = 'random:cross-video') {
   if (files.length < 2 || interlude) return;
   const alternatives = files.map((_, i) => i).filter(i => i !== currentIndex);
   const nextIndex = pick(alternatives);
@@ -547,7 +661,7 @@ function interventionCrossVideo() {
   interlude = snapshot;
   interludeBadge.classList.add('show');
   say('这让我想起了另一个东西。', 2000);
-  registerIntervention('random:cross-video');
+  registerIntervention(reason);
 
   loadFile(nextIndex, { autoplay: true, fromInterlude: true });
   const placeInterlude = () => {
@@ -599,6 +713,15 @@ function registerIntervention(reason = 'unspecified') {
       subtitleDensity: Number(perception.subtitleDensity.toFixed(3)),
       replayHeat: perception.userReplayHeat,
       pauseHeat: perception.userPauseHeat,
+    },
+    mind: {
+      mood: mind.mood,
+      arousal: Number(mind.arousal.toFixed(3)),
+      curiosity: Number(mind.curiosity.toFixed(3)),
+      impatience: Number(mind.impatience.toFixed(3)),
+      attachment: Number(mind.attachment.toFixed(3)),
+      desires: Object.fromEntries(Object.entries(mind.desires).map(([k, v]) => [k, Number(v.toFixed(3))])),
+      lastDecision: mind.lastDecision,
     },
   });
   memory.interventionLog = memory.interventionLog.slice(0, 30);
@@ -684,6 +807,7 @@ document.addEventListener('keydown', e => {
 
 window.coWatchDebug = {
   perception,
+  mind,
   memory,
   getMediaMemory: () => mediaMemory(),
   provoke: () => autonomousTick(true),
