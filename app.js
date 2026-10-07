@@ -59,6 +59,9 @@ const perception = {
   silenceMs: 0,
   brightness: .5,
   visualDelta: 0,
+  motionIntensity: 0,
+  sceneColor: { r: 222, g: 222, b: 227 },
+  subtitleDensity: 0,
   sceneCut: false,
   audioSpike: false,
   userReplayHeat: 0,
@@ -320,11 +323,20 @@ function sampleVisual() {
     const data = visualCtx.getImageData(0, 0, visualCanvas.width, visualCanvas.height).data;
     const sample = new Uint8Array(visualCanvas.width * visualCanvas.height);
     let brightnessSum = 0;
+    let redSum = 0;
+    let greenSum = 0;
+    let blueSum = 0;
 
     for (let px = 0, i = 0; i < data.length; i += 4, px += 1) {
-      const y = Math.round(data[i] * .2126 + data[i + 1] * .7152 + data[i + 2] * .0722);
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const y = Math.round(r * .2126 + g * .7152 + b * .0722);
       sample[px] = y;
       brightnessSum += y;
+      redSum += r;
+      greenSum += g;
+      blueSum += b;
     }
 
     let diff = 0;
@@ -333,12 +345,42 @@ function sampleVisual() {
       diff /= sample.length * 255;
     }
 
-    perception.brightness = brightnessSum / sample.length / 255;
+    const count = sample.length;
+    const sceneCut = diff > .19;
+    const avgR = Math.round(redSum / count);
+    const avgG = Math.round(greenSum / count);
+    const avgB = Math.round(blueSum / count);
+
+    perception.brightness = brightnessSum / count / 255;
     perception.visualDelta = diff;
-    perception.sceneCut = diff > .19;
+    perception.motionIntensity = sceneCut
+      ? perception.motionIntensity * .72
+      : perception.motionIntensity * .68 + Math.min(1, diff * 5.2) * .32;
+    perception.sceneColor = { r: avgR, g: avgG, b: avgB };
+    perception.subtitleDensity = sampleSubtitleDensity();
+    perception.sceneCut = sceneCut;
+
+    document.documentElement.style.setProperty('--scene-color', `rgb(${avgR} ${avgG} ${avgB})`);
+    document.documentElement.style.setProperty('--scene-color-soft', `rgba(${avgR}, ${avgG}, ${avgB}, .28)`);
     previousVisualSample = sample;
   } catch (e) {
     // A local browser may occasionally block canvas reads for some codecs.
+  }
+}
+
+function sampleSubtitleDensity() {
+  try {
+    let chars = 0;
+    let activeTracks = 0;
+    for (const track of video.textTracks || []) {
+      const cues = track.activeCues;
+      if (!cues?.length) continue;
+      activeTracks += 1;
+      for (const cue of cues) chars += String(cue.text || '').length;
+    }
+    return Math.min(1, chars / 70 + activeTracks * .08);
+  } catch {
+    return 0;
   }
 }
 
@@ -374,6 +416,12 @@ function evaluatePerception() {
   if (perception.sceneCut && allowTime.checked && video.currentTime > 4 && Math.random() < .2 + a * .3) {
     lastPerceptionDecisionAt = now;
     interventionRewind('这个切换，我想再看一眼。', 'perception:scene-cut', 1.8);
+    return;
+  }
+
+  if (perception.motionIntensity > .42 && perception.loudness > .22 && allowTime.checked && Math.random() < .018 + a * .035) {
+    lastPerceptionDecisionAt = now;
+    interventionRate('这一段太快了。', 'perception:high-motion', .9);
     return;
   }
 
@@ -546,6 +594,9 @@ function registerIntervention(reason = 'unspecified') {
       silenceMs: Math.round(perception.silenceMs),
       brightness: Number(perception.brightness.toFixed(3)),
       visualDelta: Number(perception.visualDelta.toFixed(3)),
+      motionIntensity: Number(perception.motionIntensity.toFixed(3)),
+      sceneColor: perception.sceneColor,
+      subtitleDensity: Number(perception.subtitleDensity.toFixed(3)),
       replayHeat: perception.userReplayHeat,
       pauseHeat: perception.userPauseHeat,
     },
