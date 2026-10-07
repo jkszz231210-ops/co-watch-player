@@ -40,10 +40,14 @@
 Perception -> Memory -> Mood -> Desire -> Decision -> Action
 ```
 
-- Mood：安静 / 好奇 / 紧张 / 无聊 / 执拗
-- Desire：继续看 / 回看 / 跳过 / 联想 / 保持沉默
-- Relationship：陌生 -> 试探 -> 熟悉 -> 默契 -> 共生
-- 个体差异：不同安装实例逐渐形成不同习惯
+- [x] MindState：arousal / curiosity / impatience / attachment
+- [x] Mood：安静 / 专注 / 躁动 / 着迷 / 游离
+- [x] Desire：回看 / 停留 / 加速 / 漫游 / 保持沉默
+- [x] Desire 权重驱动 autonomousTick
+- [x] intervention log 记录 Mind 快照
+- [ ] Mood 惯性与行为后果反馈
+- [ ] Relationship 真正反向影响行为风格
+- [ ] 个体差异：不同安装实例逐渐形成不同性格
 
 ## P3 · 真正桌面播放器
 
