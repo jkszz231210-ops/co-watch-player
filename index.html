@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>共视 · Co-Watch Player</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="player-card" id="playerCard">
+      <header class="topbar">
+        <div>
+          <div class="brand">共视 <span>CO-WATCH</span></div>
+          <div class="subtitle" id="subtitle">不是你一个人在看。</div>
+        </div>
+        <div class="relationship" title="它会记住共同观看的时间">
+          <span id="relationLabel">陌生</span>
+          <div class="relation-track"><i id="relationFill"></i></div>
+        </div>
+      </header>
+
+      <div class="stage" id="stage">
+        <video id="video" playsinline></video>
+
+        <div class="empty-state" id="emptyState">
+          <div class="eye">◉</div>
+          <h1>给它几段视频。</h1>
+          <p>它会和你一起看。偶尔也会有自己的想法。</p>
+          <label class="primary-button">
+            选择视频
+            <input id="fileInput" type="file" accept="video/*" multiple hidden />
+          </label>
+        </div>
+
+        <div class="whisper" id="whisper" aria-live="polite"></div>
+        <div class="interlude-badge" id="interludeBadge">它突然想起了另一段画面</div>
+      </div>
+
+      <section class="controls" id="controls">
+        <div class="timeline-wrap" id="timelineWrap">
+          <div class="living-track" id="livingTrack">
+            <div class="past" id="past"></div>
+            <div class="pulse" id="pulse"></div>
+            <div class="presence-dot" id="presenceDot"></div>
+          </div>
+          <input id="seek" class="seek" type="range" min="0" max="1000" value="0" aria-label="播放进度" />
+        </div>
+
+        <div class="control-row">
+          <button id="playBtn" class="icon-button" title="播放 / 暂停">▶</button>
+          <div class="time" id="timeLabel">00:00 / 00:00</div>
+          <div class="now-playing" id="nowPlaying">等待视频</div>
+          <button id="playlistBtn" class="soft-button">片单 <b id="playlistCount">0</b></button>
+          <button id="settingsBtn" class="soft-button">共视设置</button>
+          <button id="fullscreenBtn" class="icon-button" title="全屏">⛶</button>
+        </div>
+      </section>
+    </section>
+
+    <aside class="panel" id="settingsPanel">
+      <div class="panel-head">
+        <div>
+          <h2>共视设置</h2>
+          <p>不是“皮肤设置”，而是你愿意让它越界到什么程度。</p>
+        </div>
+        <button class="close-button" data-close="settingsPanel">×</button>
+      </div>
+
+      <label class="setting-block">
+        <div class="setting-title"><span>自主性</span><strong id="autonomyValue">38%</strong></div>
+        <input id="autonomy" type="range" min="0" max="100" value="38" />
+        <small>越高，它越容易主动改变观看过程。</small>
+      </label>
+
+      <label class="switch-row">
+        <span><b>时间争夺</b><small>允许它回看、前跳、对你的拖动施加“反作用”。</small></span>
+        <input id="allowTime" type="checkbox" checked />
+      </label>
+      <label class="switch-row">
+        <span><b>暂停争夺</b><small>你按下暂停后，它有小概率坚持再看一点。</small></span>
+        <input id="allowPauseFight" type="checkbox" checked />
+      </label>
+      <label class="switch-row">
+        <span><b>允许串台</b><small>播放途中，它可以短暂跳到片单中的另一个视频，然后回来。</small></span>
+        <input id="allowCrossVideo" type="checkbox" />
+      </label>
+      <label class="switch-row">
+        <span><b>记住我们</b><small>只在本机浏览器记录共同观看时长与互动次数。</small></span>
+        <input id="allowMemory" type="checkbox" checked />
+      </label>
+
+      <button id="provokeBtn" class="danger-button">现在，做点什么</button>
+      <div class="memory-box" id="memoryBox"></div>
+    </aside>
+
+    <aside class="panel" id="playlistPanel">
+      <div class="panel-head">
+        <div>
+          <h2>片单</h2>
+          <p>这里不是绝对的播放顺序，只是它目前能想到的东西。</p>
+        </div>
+        <button class="close-button" data-close="playlistPanel">×</button>
+      </div>
+      <label class="secondary-button add-more">
+        + 添加更多视频
+        <input id="moreInput" type="file" accept="video/*" multiple hidden />
+      </label>
+      <div id="playlist" class="playlist"></div>
+    </aside>
+
+    <div class="scrim" id="scrim"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
