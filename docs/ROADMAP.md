@@ -45,9 +45,9 @@ Perception -> Memory -> Mood -> Desire -> Decision -> Action
 - [x] Desire：回看 / 停留 / 加速 / 漫游 / 保持沉默
 - [x] Desire 权重驱动 autonomousTick
 - [x] intervention log 记录 Mind 快照
-- [ ] Mood 惯性与行为后果反馈
-- [ ] Relationship 真正反向影响行为风格
-- [ ] 个体差异：不同安装实例逐渐形成不同性格
+- [x] Mood 惯性与行为后果反馈
+- [x] Relationship / 接受度反向影响行为执行
+- [x] 个体差异：每个安装实例生成稳定人格参数
 
 ## P3 · 真正桌面播放器
 
