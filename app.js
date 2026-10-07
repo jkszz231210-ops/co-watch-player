@@ -245,7 +245,7 @@ async function togglePlayback(requestedByUser = true) {
     video.pause();
     playBtn.textContent = '▶';
     say(pick(['等一下。', '这里再看一点。', '先别停。', '就几秒。']));
-    registerIntervention();
+    registerIntervention('user-pause:resistance');
     setTimeout(() => video.play().catch(() => {}), 520);
     return;
   }
