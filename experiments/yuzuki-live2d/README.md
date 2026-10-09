@@ -1,3 +1,13 @@
+# V1.7：左右眼真正独立的 Cubism 美术准备稿（2026-10-09）
+
+新增 `assets/cubism-handoff/yuzuki-eye-separated-v1.7.psd`：**左眼和右眼可见且独立，皮肤补画为底层**，闭眼关键形草稿独立隐藏。6 个实际 PSD 图层、1024×1536、合成睁眼完全保留经审核立绘的每个像素。可用 Krita/Photoshop 打开查看，详情和限制见 [`docs/22-actual-eyes-psd-v17.md`](docs/22-actual-eyes-psd-v17.md)。
+
+这是一次真实的图层结构进展，但**仍不是独立上下眼皮/虹膜的专业重绘稿，也没有 Cubism 绑定工程 `.cmo3` 或 `.moc3`。**
+
+![V1.7 原画/独立眼重合/闭眼草稿](assets/cubism-handoff/yuzuki-eye-separation-qa-v1.7.jpg)
+
+---
+
 
 ## V1.6 Cubism 制作交接（2026-10-09）
 
