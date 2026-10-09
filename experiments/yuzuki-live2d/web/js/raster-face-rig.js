@@ -14,7 +14,7 @@ export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
 export function blinkValue(t){return irregularBlink(t);}
 export function desiredEyeScale(open,blink=1){return eyeScale(open,blink);}
 export function mouthShape(open){const v=clamp01(open);return {width:18+v*23,height:v*23,alpha:smootherstep(v/.15)};}
-const getImage=url=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('无法加载分层图像 '+url));im.src=url;});
+const getImage=url=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('无法加载分层图像 '+url));im.src=globalThis.__YUZUKI_OFFLINE_ASSETS?.[url.replace(/^\.\//,'')]||url;});
 export class RasterFaceRig {
   constructor(canvas,assetRoot='./assets/face-rig'){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assetRoot=assetRoot;

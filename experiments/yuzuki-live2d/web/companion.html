@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e1728">
+  <meta name="description" content="柚希 Yuzuki：可交互的二次元陪伴角色，支持聊天、语音与情绪演出。">
+  <title>柚希 · 很高兴遇见你</title>
+  <link rel="stylesheet" href="./companion.css">
+  <script type="module" src="./js/companion.js"></script>
+</head>
+<body>
+  <div class="ambient a"></div><div class="ambient b"></div>
+  <div class="app" id="app">
+    <header class="topbar">
+      <a href="./companion.html" class="wordmark" aria-label="柚希主页"><span class="star">✧</span> 柚希 <small>Y U Z U K I</small></a>
+      <div class="topright"><span class="status"><span class="dot"></span><span id="connectionLabel">本地陪伴模式</span></span><button class="quiet" type="button" id="helpButton" title="了解本次成品状态">关于此版本</button></div>
+    </header>
+    <main class="layout">
+      <section class="visual" id="visual" aria-label="柚希角色动画">
+        <div class="visual-top"><span class="eyebrow">A MOMENT WITH YUZUKI</span><span class="ephemeral">✦ · ✧ · ✦</span></div>
+        <div class="aura"></div><div class="halo halo-one"></div><div class="halo halo-two"></div>
+        <div class="portrait" id="portrait">
+          <canvas id="rigCanvas" class="rig hidden" width="1024" height="1536" role="img" aria-label="柚希：独立眉眼嘴栅格图层演出"></canvas>
+          <img id="portraitFallback" class="rig" src="./assets/yuzuki-front-a.webp" draggable="false" alt="柚希，灰蓝眼睛、长发与蓝白色服装的日系动漫女性角色">
+        </div>
+        <div class="visual-bottom"><span id="emotionReadout">♡ 温柔地看着你</span><span class="model-note">2D FACIAL ANIMATION · V1.0</span></div>
+        <div class="float-symbol f1">✧</div><div class="float-symbol f2">⋆</div>
+      </section>
+      <section class="conversation" aria-label="与柚希聊天">
+        <div class="welcome"><span class="eyebrow">WELCOME HOME</span><h1>你回来啦。<span>♡</span></h1><p>今天想和我分享些什么？<br>开心的、难过的，或者只是随便聊聊，都可以。</p></div>
+        <div class="scene-title"><span>此刻的心情</span><span class="scene-small">轻触试试不同的表情</span></div>
+        <div class="moods" id="moodButtons" aria-label="切换角色心情">
+          <button type="button" class="mood active" data-emotion="smile">☺ <span>微笑</span></button>
+          <button type="button" class="mood" data-emotion="joy">✧ <span>开心</span></button>
+          <button type="button" class="mood" data-emotion="shy">♡ <span>害羞</span></button>
+          <button type="button" class="mood" data-emotion="curious">？ <span>疑惑</span></button>
+          <button type="button" class="mood" data-emotion="tender">☁ <span>温柔</span></button>
+        </div>
+        <div class="section-line"><strong>和柚希聊聊</strong><span id="talkMode">本地演示</span></div>
+        <div class="chat" id="chat" aria-live="polite" aria-label="聊天记录"><div class="bubble bot"><span class="bubble-head">柚希 · 刚刚</span><p>你好呀，今天过得怎么样？我有在认真等你哦。 ♡</p></div></div>
+        <form class="compose" id="chatForm">
+          <label class="sr-only" for="chatInput">发送给柚希的内容</label>
+          <input id="chatInput" type="text" maxlength="400" required placeholder="想跟柚希说些什么……" autocomplete="off">
+          <button class="send" type="submit" id="sendButton" aria-label="发送消息">➜</button>
+        </form>
+        <div class="actions">
+          <button id="demoButton" type="button" class="chip"><span>✦</span> 看一段互动演出</button>
+          <button id="voiceButton" type="button" class="chip" aria-pressed="false"><span>♪</span> <span id="voiceText">开启朗读</span></button>
+          <button id="recognitionButton" type="button" class="chip"><span>♩</span> 语音输入</button>
+          <button id="motionButton" type="button" class="chip" aria-pressed="true"><span>◌</span> <span id="motionText">动态开启</span></button>
+        </div>
+        <div class="footnote"><span id="feedback" aria-live="polite">可以直接输入聊天，无需账号或配置。</span><a href="./index.html">高级调试 ↗</a></div>
+      </section>
+    </main>
+    <footer>AN ORIGINAL CHARACTER EXPERIMENT · 有你的时光，便是好天气。</footer>
+  </div>
+  <dialog class="about" id="aboutDialog"><h2>关于柚希 · V1.0</h2><p>这里展示的是基于已审核立绘制作的独立眉眼嘴栅格动画，并非 Live2D Cubism .moc3 模型或真正的三维转头。</p><p>不开启 AI 服务时，本地规则回复可以离线测试情绪演出。要与真实模型聊天，请在本地启动器配置 OpenAI 兼容 API 的环境变量，密钥只保留在本机服务端。</p><button id="aboutClose" type="button">知道啦 ♡</button></dialog>
+</body>
+</html>

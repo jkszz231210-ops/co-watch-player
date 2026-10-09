@@ -1,6 +1,6 @@
 {
   "name": "yuzuki-character-lab",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Experimental local facial animation with audio-reactive mouth, not Cubism model",
