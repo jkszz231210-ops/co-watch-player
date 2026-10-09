@@ -13,7 +13,7 @@
         555
       ],
       "centre": [
-        403,
+        403.0,
         507.5
       ],
       "canvas_box": [
@@ -31,7 +31,7 @@
         540
       ],
       "centre": [
-        623,
+        623.0,
         487.5
       ],
       "canvas_box": [
@@ -49,7 +49,7 @@
         656
       ],
       "centre": [
-        516,
+        516.0,
         631.5
       ],
       "canvas_box": [
@@ -61,27 +61,66 @@
     }
   },
   "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "additional_artwork": {
     "eye_left_closed": {
-      "file": "eye_left_closed.svg",
+      "file": "eye_left_closed.webp",
       "box": [
         338,
         460,
         468,
         555
       ],
-      "use": "opacity blended unilateral eyelid"
+      "use": "opacity-weighted wink/blink closure"
     },
     "eye_right_closed": {
-      "file": "eye_right_closed.svg",
+      "file": "eye_right_closed.webp",
       "box": [
         551,
         435,
         695,
         540
       ],
-      "use": "opacity blended unilateral eyelid"
+      "use": "opacity-weighted wink/blink closure"
     }
-  }
+  },
+  "prototype_source": "assets/face-rig/yuzuki-facial-prototype-v07.ora",
+  "limitations": [
+    "Brow line extraction is retouched from original; bang occlusion needs painter cleanup",
+    "Iris only moves 1-3px; no eye-geometry or Cubism warp",
+    "Not a Cubism PSD, Cubism .cmo3 or runtime .moc3"
+  ],
+  "iris_centres": {
+    "eye_left": [
+      404,
+      498
+    ],
+    "eye_right": [
+      613,
+      480
+    ]
+  },
+  "brow_boxes": {
+    "brow_left": [
+      306,
+      398,
+      469,
+      447
+    ],
+    "brow_right": [
+      548,
+      381,
+      695,
+      432
+    ]
+  },
+  "experimental_layers": [
+    "base_v07.webp",
+    "eye_left_sclera.webp",
+    "eye_right_sclera.webp",
+    "eye_left_iris.webp",
+    "eye_right_iris.webp",
+    "brow_left.webp",
+    "brow_right.webp"
+  ]
 }

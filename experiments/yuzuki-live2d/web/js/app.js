@@ -50,11 +50,12 @@ microphoneButton.addEventListener('click',async()=>{
 });
 $('faceSnapshot').addEventListener('click',()=>{
  if(!rig.ready){audioStatus.textContent='正在加载角色素材，稍后再试。';return;}
- const link=document.createElement('a');link.download='Yuzuki-v0.6-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
+ const link=document.createElement('a');link.download='Yuzuki-v0.7-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
 });
 // Pointer-follow is subtle and can be switched off through the motion control.
 $('stage').addEventListener('pointermove',event=>{
  if(!motionEnabled)return;const box=$('stage').getBoundingClientRect();rig.setGaze(((event.clientX-box.left)/box.width-.5)*2,((event.clientY-box.top)/box.height-.5)*2);
 });
 $('stage').addEventListener('pointerleave',()=>rig.setGaze(0,0));
+for(const button of document.querySelectorAll('[data-look]'))button.addEventListener('click',()=>{const value=button.dataset.look;rig.setGaze(value==='left'?-1:value==='right'?1:0,0);});
 window.addEventListener('beforeunload',()=>{rig.stop();cancelStory();engine.destroy();void mic.stop();window.speechSynthesis?.cancel();});

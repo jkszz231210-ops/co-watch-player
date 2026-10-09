@@ -13,7 +13,7 @@
 <div class="page-shell">
   <header class="topbar">
     <a class="brand" href="#top" aria-label="返回顶部"><span class="brand-mark">✧</span><span>柚希 <small>YUZUKI</small></span></a>
-    <div class="top-actions"><span class="tiny-pill"><span class="online-dot"></span>FACE RIG · V0.6</span><button id="motionToggle" class="icon-button" type="button" aria-pressed="false" title="关闭动态效果">◌ <span>动态</span></button></div>
+    <div class="top-actions"><span class="tiny-pill"><span class="online-dot"></span>FACE RIG · V0.7</span><button id="motionToggle" class="icon-button" type="button" aria-pressed="false" title="关闭动态效果">◌ <span>动态</span></button></div>
   </header>
   <main id="top">
     <section class="intro">
@@ -24,11 +24,11 @@
     </section>
     <div class="main-layout">
       <section class="character-panel panel" aria-label="角色展示区">
-        <div class="panel-top"><div><span class="eyebrow small">CHARACTER STUDIO / 角色预览</span><h2>柚希 <small>ゆずき</small></h2></div><span class="concept-stamp">眼嘴分层动态原型 · 非 Cubism</span></div>
+        <div class="panel-top"><div><span class="eyebrow small">CHARACTER STUDIO / 角色预览</span><h2>柚希 <small>ゆずき</small></h2></div><span class="concept-stamp">眉眼嘴分层动态原型 · 非 Cubism</span></div>
         <div class="stage" id="stage">
           <div class="stage-halo"></div>
           <div class="floating-flake flake-a">✧</div><div class="floating-flake flake-b">✦</div><div class="floating-flake flake-c">✧</div>
-          <div class="art-holder" id="artHolder"><canvas id="faceRigCanvas" class="character-art face-rig-canvas hidden" width="1024" height="1536" role="img" aria-label="柚希动态角色，双眼独立眨眼、单眼 Wink 和嘴型变化"></canvas><img id="characterArt" class="character-art" src="./assets/yuzuki-front-a.webp" alt="柚希：灰蓝眼睛、深茶灰发色、白蓝色服装的二次元女性半身美术概念图" draggable="false"></div>
+          <div class="art-holder" id="artHolder"><canvas id="faceRigCanvas" class="character-art face-rig-canvas hidden" width="1024" height="1536" role="img" aria-label="柚希动态角色，双眼独立眨眼、轻微虹膜追视、眉毛情绪变化和口型变化"></canvas><img id="characterArt" class="character-art" src="./assets/yuzuki-front-a.webp" alt="柚希：灰蓝眼睛、深茶灰发色、白蓝色服装的二次元女性半身美术概念图" draggable="false"></div>
           <div class="stage-caption"><span class="pulse-dot"></span><span id="stageMood">现在的心情 · 温柔</span></div>
         </div>
         <div class="character-footer"><div><strong>柚希 / Yuzuki</strong><span>可爱 · 温柔 · 知性 · 灵动 · 梦幻</span></div><button id="sheetButton" class="secondary-button" type="button">查看角色设定 ↗</button></div>
@@ -59,7 +59,7 @@
           <div id="paramBars" class="param-bars"></div>
           <div class="param-note"><strong>驱动分层</strong><br>常驻眨眼、呼吸 → 表情权重 → 语音口型 → 优先级混合 → 实际模型。避免 AI 直接写入所有网格参数。</div>
           <button id="demoSequence" type="button" class="primary-button">▶ 播放“惊讶 → 害羞 → 微笑”</button>
-          <div class="rig-trials"><strong>独立五官试动 · 鼠标/触屏可直接试</strong><div class="trial-buttons"><button type="button" id="blinkTest" class="secondary-button">眨眼一次</button><button type="button" id="mouthTest" class="secondary-button">张嘴一下</button><button type="button" id="winkLeftTest" class="secondary-button">左眼 Wink ♡</button><button type="button" id="winkRightTest" class="secondary-button">右眼 Wink ♡</button><button type="button" id="restorePose" class="secondary-button">恢复自动</button></div><div class="trial-buttons"><button type="button" data-viseme="a" class="secondary-button">口型 A</button><button type="button" data-viseme="i" class="secondary-button">口型 I</button><button type="button" data-viseme="o" class="secondary-button">口型 O</button></div><div class="trial-buttons"><button type="button" id="microphoneMouth" class="secondary-button">🎤 麦克风驱动嘴型</button><button type="button" id="faceSnapshot" class="secondary-button">📸 保存当前画面</button></div><p id="audioStatus" aria-live="polite">语音朗读时使用近似口型节奏；麦克风驱动使用本地真实音量。未经授权不启用麦克风。</p><p>从定稿图提取透明眼、嘴图层，并增加左右独立的闭眼线图层；使用参数化唇形，非 Cubism 3D 转头。完整 OpenRaster 工程在 assets/face-rig 中。</p></div>
+          <div class="rig-trials"><strong>独立五官试动 · 鼠标/触屏可直接试</strong><div class="trial-buttons"><button type="button" id="blinkTest" class="secondary-button">眨眼一次</button><button type="button" id="mouthTest" class="secondary-button">张嘴一下</button><button type="button" id="winkLeftTest" class="secondary-button">左眼 Wink ♡</button><button type="button" id="winkRightTest" class="secondary-button">右眼 Wink ♡</button><button type="button" id="restorePose" class="secondary-button">恢复自动</button></div><div class="trial-buttons"><button type="button" data-look="left" class="secondary-button">← 看向左边</button><button type="button" data-look="center" class="secondary-button">恢复视线</button><button type="button" data-look="right" class="secondary-button">看向右边 →</button></div><div class="trial-buttons"><button type="button" data-viseme="a" class="secondary-button">口型 A</button><button type="button" data-viseme="i" class="secondary-button">口型 I</button><button type="button" data-viseme="o" class="secondary-button">口型 O</button></div><div class="trial-buttons"><button type="button" id="microphoneMouth" class="secondary-button">🎤 麦克风驱动嘴型</button><button type="button" id="faceSnapshot" class="secondary-button">📸 保存当前画面</button></div><p id="audioStatus" aria-live="polite">语音朗读时使用近似口型节奏；麦克风驱动使用本地真实音量。未经授权不启用麦克风。</p><p>从定稿图实际提取左右虹膜、修复眼白、描摹左右眉线；眨眼、眉眼情绪和说话口型均可控制。它是试验分层，非正式 Cubism 网格。完整 OpenRaster 工程在 assets/face-rig 中。</p></div>
         </section>
       </section>
     </div>

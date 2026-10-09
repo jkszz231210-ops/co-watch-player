@@ -1,11 +1,11 @@
 /**
- * V0.6 artwork-preserving raster facial renderer.
+ * V0.7 artwork-preserving raster facial renderer.
  * True independently animated eye and lip art; NOT a Cubism .moc3 or simulated 3D turn.
  */
 import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-performance.js';
 import {drawBlush,drawLips} from './facial-art.js';
-import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,eyeOffsetsFromGaze,winkEnvelope} from './eye-performance.js';
-export const RIG_VERSION='0.6.0';
+import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,eyeOffsetsFromGaze,winkEnvelope,browYOffset,irisOffset} from './eye-performance.js';
+export const RIG_VERSION='0.7.0';
 export const PART_BOXES={eye_left:[338,460,468,555],eye_right:[551,435,695,540],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
@@ -23,7 +23,7 @@ export class RasterFaceRig {
     this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;
   }
   async load(){
-    const names=['base','eye_left','eye_right','mouth','eye_left_closed','eye_right_closed'];
+    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_closed','eye_right_closed'];
     const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}${name.endsWith('_closed')?'.svg':'.webp'}`)));
     names.forEach((name,i)=>this.parts[name]=loaded[i]);this.ready=true;
     this.draw(performance.now());return this;
@@ -48,10 +48,16 @@ export class RasterFaceRig {
     const active=this.enabled;
     this.gaze.x+=(this.gaze.targetX-this.gaze.x)*Math.min(1,delta*6);
     this.gaze.y+=(this.gaze.targetY-this.gaze.y)*Math.min(1,delta*6);
-    ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.base,0,0);
+    ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.base_v07,0,0);
+    // Eyebrow strokes are separately addressable. Keep displacement tiny while original bangs await artist cleanup.
+    for(const side of ['brow_left','brow_right']){
+      const box=side==='brow_left'?[306,398,469,447]:[548,381,695,432];
+      const shift=active?browYOffset({emotion:this.emotion,tension:p.browTension,side}):0;
+      ctx.drawImage(this.parts[side],box[0],box[1]+shift,box[2]-box[0],box[3]-box[1]);
+    }
     const winkProgress=this.winkState&&active ? winkEnvelope(t-this.winkState.started) : 0;
     if(this.winkState&&t-this.winkState.started>850)this.winkState=null;
-    const gaze=eyeOffsetsFromGaze(this.gaze.x,this.gaze.y);
+    const gaze=irisOffset(this.gaze.x,this.gaze.y);
     for(const side of ['eye_left','eye_right']){
       const blink=this.forceEye!==null?clamp01(this.forceEye):(active?blinkForSide(t-this.started,side):1);
       const wink=side===this.winkState?.side?winkProgress:0;
@@ -59,7 +65,10 @@ export class RasterFaceRig {
       const [x,y,x2,y2]=PART_BOXES[side],w=x2-x,h=y2-y;
       const cy=(y+y2)/2,eyelashCentre=cy-5;
       ctx.save();ctx.globalAlpha=eyeArtOpacity(openness);
-      ctx.drawImage(this.parts[side],x+gaze.x,eyelashCentre-(h*openness)/2+gaze.y,w,h*openness);
+      const top=eyelashCentre-(h*openness)/2;
+      // Draw repaired sclera and painted eyeliner at a fixed position. Only the iris art follows gaze.
+      ctx.drawImage(this.parts[`${side}_sclera`],x,top,w,h*openness);
+      ctx.drawImage(this.parts[`${side}_iris`],x+gaze.x,top+gaze.y*openness,w,h*openness);
       ctx.restore();
       const lidAlpha=eyeLidOpacity(openness);
       if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_closed`],x,y,w,h);ctx.restore();}
