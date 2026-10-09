@@ -1,0 +1,88 @@
+{
+  "format": "yuzuki-rig-production-manifest-v1",
+  "status": "NOT_DRAWN",
+  "canvas": {
+    "width": 3072,
+    "height": 4608,
+    "colorMode": "RGBA"
+  },
+  "reference": "REQUIRES_USER_ART_APPROVAL",
+  "notes": "Blueprint only; these are planned layer names, not real exported art",
+  "requiredGroups": {
+    "face": [
+      "face_base",
+      "face_shadow",
+      "ear_left",
+      "ear_right",
+      "neck",
+      "blush_left",
+      "blush_right",
+      "nose"
+    ],
+    "eye_left": [
+      "sclera_L",
+      "iris_L",
+      "pupil_L",
+      "highlight_primary_L",
+      "highlight_secondary_L",
+      "upper_lash_L",
+      "lower_lash_L",
+      "upper_lid_L",
+      "lower_lid_L",
+      "eye_shadow_L"
+    ],
+    "eye_right": [
+      "sclera_R",
+      "iris_R",
+      "pupil_R",
+      "highlight_primary_R",
+      "highlight_secondary_R",
+      "upper_lash_R",
+      "lower_lash_R",
+      "upper_lid_R",
+      "lower_lid_R",
+      "eye_shadow_R"
+    ],
+    "brow": [
+      "brow_L",
+      "brow_R"
+    ],
+    "mouth": [
+      "upper_lip_line",
+      "lower_lip_line",
+      "mouth_cavity",
+      "teeth",
+      "tongue"
+    ],
+    "hair": [
+      "top_hair",
+      "bang_front_center",
+      "bang_front_L",
+      "bang_front_R",
+      "side_hair_L",
+      "side_hair_R",
+      "back_hair_L",
+      "back_hair_R",
+      "tips_hair_L",
+      "tips_hair_R",
+      "hair_ornament"
+    ],
+    "body": [
+      "shoulder_L",
+      "shoulder_R",
+      "clothes_base",
+      "sleeve_L",
+      "sleeve_R",
+      "bow",
+      "brooch"
+    ]
+  },
+  "editor": "Live2D Cubism Editor",
+  "qa": {
+    "hiddenRegionRedrawRequired": true,
+    "noWhiteFringes": true,
+    "eyesIndependent": true,
+    "mouthInteriorIndependent": true,
+    "noFlattenedFakeLayers": true
+  }
+}
