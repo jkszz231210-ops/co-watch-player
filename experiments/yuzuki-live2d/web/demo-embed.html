@@ -4,7 +4,7 @@
 <main><h1>把柚希带到<span>你的网页</span> ♡</h1><p>这是一个独立的普通网页。柚希通过隔离的 iframe 挂件出现在右下角，不需要重新实现角色动画，也不会改写原页面布局。</p>
 <section class="panel"><h2>和她互动</h2><p>以下按钮由<strong>宿主页面</strong>直接发送指令：切换表情、让角色展示文字、关闭或重新打开。原页面与角色引擎各自独立。</p>
 <button type="button" id="compliment">夸夸柚希</button><button type="button" id="comfort">让她安慰我</button><button type="button" id="celebrate">分享好消息</button><button type="button" class="secondary" id="toggle">隐藏 / 显示柚希</button><p id="feedback" aria-live="polite">角色正在加载……</p></section>
-<p class="note">本版本是有独立眉眼嘴层的二维栅格角色，不是 Cubism .moc3。你也可以将 <code>widget.html</code> 与 <code>embed-loader.js</code> 放入自己的网站。</p></main><footer>柚希 · 网页陪伴演示 V1.2</footer>
+<p class="note">本版本是有独立眉眼嘴层的二维栅格角色，不是 Cubism .moc3。你也可以将 <code>widget.html</code> 与 <code>embed-loader.js</code> 放入自己的网站。</p></main><footer>柚希 · 网页陪伴演示 V1.5</footer>
 <script src="./js/embed-loader.js"></script><script>
 const widget=YuzukiEmbed.mount({onEvent:e=>{if(e.event==='ready')document.querySelector('#feedback').textContent='柚希已经来到网页啦！';}});
 document.querySelector('#compliment').onclick=()=>widget.say('欸……突然这样夸我，好害羞呀。♡','shy');

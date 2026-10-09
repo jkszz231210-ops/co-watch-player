@@ -4,11 +4,11 @@
  */
 import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-performance.js';
 import {drawBlush,drawLips} from './facial-art.js';
-import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,winkEnvelope,browYOffset,irisOffset} from './eye-performance.js';
-import {eyelidAperture,traceAperture,paintMovingLid} from './eye-aperture.js';
+import {winkEnvelope} from './eye-performance.js';
+import {drawBlink,blinkClosure} from './blink-v15.js';
 import {advanceFace,idleGaze,idleBreath,DEFAULT_FACE} from './performance-timeline.js';
-export const RIG_VERSION='0.9.0';
-export const PART_BOXES={eye_left:[338,460,468,555],eye_right:[551,435,695,540],mouth:[468,607,564,656]};
+export const RIG_VERSION='1.5.0';
+export const PART_BOXES={eye_left:[339,456,469,559],eye_right:[554,451,684,554],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
 export function blinkValue(t){return irregularBlink(t);}
@@ -25,9 +25,11 @@ export class RasterFaceRig {
     this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;this.gazeAuto=true;this.stageTilt=0;
   }
   async load(){
-    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_soft_closed','eye_right_soft_closed','eye_left_fold','eye_right_fold','eye_left_lashes','eye_right_lashes'];
-    const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}.webp`)));
-    names.forEach((name,i)=>this.parts[name]=loaded[i]);this.ready=true;
+    const names=['portrait_base','mouth'];
+    const urls={portrait_base:'./assets/yuzuki-front-a.webp',mouth:`${this.assetRoot}/mouth.webp`};
+    const loaded=await Promise.all(names.map(name=>getImage(urls[name])));
+    names.forEach((name,i)=>this.parts[name]=loaded[i]);
+    this.parts.blinkAtlas=await getImage(`${this.assetRoot}/blink-v15/blink-atlas.webp`);this.ready=true;
     this.draw(performance.now());return this;
   }
   update(params,emotion=null){this.params={...this.params,...params};if(emotion)this.emotion=emotion;}
@@ -56,39 +58,17 @@ export class RasterFaceRig {
     this.gaze.y+=(gy-this.gaze.y)*Math.min(1,delta*5);
     this.stageTilt=active?idleBreath(t-this.started,this.emotion):0;
     this.onFrame?.(this.stageTilt,p);
-    ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.base_v07,0,0);
-    // Eyebrow strokes are separately addressable. Keep displacement tiny while original bangs await artist cleanup.
-    for(const side of ['brow_left','brow_right']){
-      const box=side==='brow_left'?[306,398,469,447]:[548,381,695,432];
-      const shift=active?browYOffset({emotion:this.emotion,tension:p.browTension,side}):0;
-      ctx.drawImage(this.parts[side],box[0],box[1]+shift,box[2]-box[0],box[3]-box[1]);
-    }
+    ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.portrait_base,0,0);
     const winkProgress=this.winkState&&active ? winkEnvelope(t-this.winkState.started) : 0;
     if(this.winkState&&t-this.winkState.started>850)this.winkState=null;
-    const gaze=irisOffset(this.gaze.x,this.gaze.y);
     for(const side of ['eye_left','eye_right']){
-      const blink=this.forceEye!==null?clamp01(this.forceEye):(active?blinkForSide(t-this.started,side):1);
+      // Natural open state is pixel-identical to the approved concept portrait.
+      // Both eyes share a blink clock; their artwork preserves natural asymmetry.
+      const blink=this.forceEye!==null?clamp01(this.forceEye):(active?irregularBlink(t-this.started):1);
       const wink=side===this.winkState?.side?winkProgress:0;
-      const openness=eyePose({emotionEye:p.eyeOpen,smile:p.smile,browTension:p.browTension,blink,wink,side,emotion:this.emotion});
-      const [x,y,x2,y2]=PART_BOXES[side],w=x2-x,h=y2-y;
-      const shape=eyelidAperture(side,openness);
-      // Keep iris and sclera at their painted dimensions. An eye-shaped
-      // aperture clips both instead of crushing the pupil during blinking.
-      ctx.save();ctx.globalAlpha=eyeArtOpacity(openness);
-      if(openness<.96){traceAperture(ctx,shape);ctx.clip();}
-      ctx.drawImage(this.parts[`${side}_sclera`],x,y,w,h);
-      ctx.drawImage(this.parts[`${side}_iris`],x+gaze.x,y+gaze.y,w,h);
-      // Lashes are in the foreground. This preserves the original ink edge.
-      ctx.save();ctx.globalAlpha=.30+.70*smootherstep((openness-.23)/.57);
-      ctx.drawImage(this.parts[`${side}_lashes`],x,y,w,h);ctx.restore();
-      ctx.restore();
-      if(openness<.95&&openness>.19){
-        paintMovingLid(ctx,shape);
-        const crease=Math.max(0,1-Math.abs(openness-.55)/.35)*.35;
-        if(crease>.001){ctx.save();ctx.globalAlpha=crease;ctx.drawImage(this.parts[`${side}_fold`],x,y,w,h);ctx.restore();}
-      }
-      const lidAlpha=eyeLidOpacity(openness);
-      if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_soft_closed`],x,y,w,h);ctx.restore();}
+      const closure=blinkClosure(blink,wink);
+      const bounds=side==='eye_left'?[319,442,489,571]:[536,414,713,563];
+      drawBlink(ctx,this.parts.blinkAtlas,bounds,closure,side==='eye_left'?0:1);
     }
     drawBlush(ctx,p.blush);
     let viseme='a',targetVoice=0;

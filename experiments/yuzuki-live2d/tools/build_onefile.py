@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 WEB=ROOT/'web'
 TARGET=ROOT/'柚希-双击直接体验.html'
 MODULES=['face-performance','eye-aperture','eye-performance','performance-timeline',
-         'facial-art','character-engine','raster-face-rig','interaction-director','session-store','companion']
+         'facial-art','blink-v15','character-engine','raster-face-rig','interaction-director','session-store','companion']
 
 
 def compile_module(name):
@@ -37,15 +37,15 @@ def build():
     html=(WEB/'companion.html').read_text(encoding='utf-8')
     style=(WEB/'companion.css').read_text(encoding='utf-8')
     assets={}
-    for name in ['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris',
-                 'eye_right_iris','brow_left','brow_right','mouth',
-                 'eye_left_soft_closed','eye_right_soft_closed','eye_left_fold',
-                 'eye_right_fold','eye_left_lashes','eye_right_lashes']:
+    for name in ['mouth','eye_left_soft_closed','eye_right_soft_closed','eye_left_fold','eye_right_fold']:
         f=WEB/'assets/face-rig'/f'{name}.webp'
         assert f.is_file(),f
         assets[f'assets/face-rig/{name}.webp']='data:image/webp;base64,'+base64.b64encode(f.read_bytes()).decode()
+    atlas=(WEB/'assets/face-rig/blink-v15/blink-atlas.webp').read_bytes()
+    assets['assets/face-rig/blink-v15/blink-atlas.webp']='data:image/webp;base64,'+base64.b64encode(atlas).decode()
     portrait=WEB/'assets/yuzuki-front-a.webp'
     embedded_portrait='data:image/webp;base64,'+base64.b64encode(portrait.read_bytes()).decode()
+    assets['assets/yuzuki-front-a.webp']=embedded_portrait
     html=html.replace('<link rel="stylesheet" href="./companion.css">','<style>'+style+'</style>')
     html=html.replace('<script type="module" src="./js/companion.js"></script>','')
     html=html.replace('src="./assets/yuzuki-front-a.webp"','src="'+embedded_portrait+'"')
@@ -66,7 +66,7 @@ const exports={};__instances__.set(name,exports);loader(__require__,exports);ret
 
 
 WIDGET_MODULES=['face-performance','eye-aperture','eye-performance','performance-timeline',
-                'facial-art','character-engine','raster-face-rig','widget-protocol','widget']
+                'facial-art','blink-v15','character-engine','raster-face-rig','widget-protocol','widget']
 
 def build_widget():
     """Self-contained independently embeddable widget with the existing approved rig."""
@@ -74,13 +74,12 @@ def build_widget():
     style=(WEB/'widget.css').read_text('utf-8')
     source=(WEB/'assets/yuzuki-front-a.webp').read_bytes()
     portrait='data:image/webp;base64,'+base64.b64encode(source).decode()
-    assets={}
-    for name in ['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris',
-                 'eye_right_iris','brow_left','brow_right','mouth',
-                 'eye_left_soft_closed','eye_right_soft_closed','eye_left_fold',
-                 'eye_right_fold','eye_left_lashes','eye_right_lashes']:
+    assets={'assets/yuzuki-front-a.webp':portrait}
+    for name in ['mouth','eye_left_soft_closed','eye_right_soft_closed','eye_left_fold','eye_right_fold']:
         f=WEB/'assets/face-rig'/f'{name}.webp'
         assets[f'assets/face-rig/{name}.webp']='data:image/webp;base64,'+base64.b64encode(f.read_bytes()).decode()
+    atlas=(WEB/'assets/face-rig/blink-v15/blink-atlas.webp').read_bytes()
+    assets['assets/face-rig/blink-v15/blink-atlas.webp']='data:image/webp;base64,'+base64.b64encode(atlas).decode()
     html=html.replace('<link rel="stylesheet" href="./widget.css">','<style>'+style+'</style>')
     html=html.replace('<script type="module" src="./js/widget.js"></script>','')
     html=html.replace('src="./assets/yuzuki-front-a.webp"','src="'+portrait+'"')

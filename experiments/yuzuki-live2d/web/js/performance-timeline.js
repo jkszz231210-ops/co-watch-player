@@ -31,15 +31,13 @@ export function advanceFace(current,target,dt,enabled=true){
   return next;
 }
 
-const EYE_TARGETS=Object.freeze([
-  [0,0],[.21,-.16],[-.22,.10],[.07,.07],[.0,0],[-.12,-.08],[.13,.13],[0,0]
-]);
+const EYE_TARGETS=Object.freeze([[0,0],[.08,-.04],[-.09,.04],[0,0],[-.05,-.03],[.06,.05],[0,0]]);
 const fade=t=>{const s=clamp01(t);return s*s*(3-2*s);};
 /** Small, deterministic gaze drifts with meaningful rests, not continuous scanning. */
 export function idleGaze(elapsedMs=0){
   if(!Number.isFinite(elapsedMs)||elapsedMs<0)return {x:0,y:0};
   const t=elapsedMs%30000;
-  const slot=Math.floor(t/3750),fraction=(t%3750)/3750;
+  const slot=Math.floor(t/3750)%EYE_TARGETS.length,fraction=(t%3750)/3750;
   const from=EYE_TARGETS[slot],to=EYE_TARGETS[(slot+1)%EYE_TARGETS.length];
   // Hold the eye for most of the time, then glance and settle.
   const progress=fade((fraction-.73)/.18);
