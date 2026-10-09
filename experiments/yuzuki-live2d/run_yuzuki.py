@@ -9,7 +9,7 @@ import webbrowser
 
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / 'web'
-REQUIRED = ('index.html', 'js/app.js', 'js/art-direction.js', 'assets/yuzuki-front-a.webp')
+REQUIRED = ('index.html', 'js/app.js', 'js/art-direction.js', 'assets/yuzuki-front-a.webp', 'js/raster-face-rig.js', 'assets/face-rig/base.webp', 'assets/face-rig/eye_left.webp', 'assets/face-rig/eye_right.webp', 'assets/face-rig/mouth.webp')
 
 
 def validate():
@@ -30,7 +30,7 @@ def main():
     args = parser.parse_args()
     validate()
     if args.check:
-        print('检查通过：角色主视觉已锁定，网页文件齐全。')
+        print('检查通过：立绘已锁定，独立眼睛与嘴部图层及网页代码齐全。')
         return
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(WEB))
     try:

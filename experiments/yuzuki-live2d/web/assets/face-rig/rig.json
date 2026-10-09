@@ -1,0 +1,64 @@
+{
+  "canvas": [
+    1024,
+    1536
+  ],
+  "source": "../source/yuzuki-front-a.png",
+  "regions": {
+    "eye_left": {
+      "box": [
+        338,
+        460,
+        468,
+        555
+      ],
+      "centre": [
+        403.0,
+        507.5
+      ],
+      "canvas_box": [
+        337,
+        466,
+        470,
+        550
+      ]
+    },
+    "eye_right": {
+      "box": [
+        551,
+        435,
+        695,
+        540
+      ],
+      "centre": [
+        623.0,
+        487.5
+      ],
+      "canvas_box": [
+        550,
+        441,
+        694,
+        538
+      ]
+    },
+    "mouth": {
+      "box": [
+        468,
+        607,
+        564,
+        656
+      ],
+      "centre": [
+        516.0,
+        631.5
+      ],
+      "canvas_box": [
+        469,
+        610,
+        562,
+        651
+      ]
+    }
+  },
+  "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD"
+}

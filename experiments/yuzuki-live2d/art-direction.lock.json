@@ -1,6 +1,6 @@
 {
   "schema": "yuzuki.art-direction.lock.v1",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "approved": true,
   "source": "User selected the middle portrait in conversation on 2026-10-09",
   "candidateId": "front-a",
@@ -31,5 +31,5 @@
       "不能从现有信息合理推断的重大方向变化"
     ]
   },
-  "scope": "Visual art direction approved. Does not imply separate PSD art layers, Cubism mesh rig, or finished Live2D model."
+  "scope": "Character front-a art is approved; experimental raster eye and mouth layers are now present, but no production PSD or Cubism moc3 model."
 }
