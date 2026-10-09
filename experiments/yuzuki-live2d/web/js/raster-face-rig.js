@@ -6,7 +6,8 @@ import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-pe
 import {drawBlush,drawLips} from './facial-art.js';
 import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,winkEnvelope,browYOffset,irisOffset} from './eye-performance.js';
 import {eyelidAperture,traceAperture,paintMovingLid} from './eye-aperture.js';
-export const RIG_VERSION='0.8.0';
+import {advanceFace,idleGaze,idleBreath,DEFAULT_FACE} from './performance-timeline.js';
+export const RIG_VERSION='0.9.0';
 export const PART_BOXES={eye_left:[338,460,468,555],eye_right:[551,435,695,540],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
@@ -17,15 +18,15 @@ const getImage=url=>new Promise((resolve,reject)=>{const im=new Image();im.onloa
 export class RasterFaceRig {
   constructor(canvas,assetRoot='./assets/face-rig'){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assetRoot=assetRoot;
-    this.parts={};this.ready=false;this.params={eyeOpen:.62,mouthOpen:0,smile:.08,blush:0,browTension:0,headTilt:0};
+    this.parts={};this.ready=false;this.params={...DEFAULT_FACE};this.renderParams={...DEFAULT_FACE};
     this.enabled=true;this.forceEye=null;this.forceMouth=null;this.forceViseme='a';this.started=performance.now();this.frame=0;
     this.voice={text:'',started:0,wordIndex:0,mode:'off'};
     this.mic=null;this.gaze={x:0,y:0,targetX:0,targetY:0};
-    this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;
+    this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;this.gazeAuto=true;this.stageTilt=0;
   }
   async load(){
-    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_closed','eye_right_closed','eye_left_lashes','eye_right_lashes'];
-    const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}${name.endsWith('_closed')?'.svg':'.webp'}`)));
+    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_soft_closed','eye_right_soft_closed','eye_left_fold','eye_right_fold','eye_left_lashes','eye_right_lashes'];
+    const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}.webp`)));
     names.forEach((name,i)=>this.parts[name]=loaded[i]);this.ready=true;
     this.draw(performance.now());return this;
   }
@@ -39,16 +40,22 @@ export class RasterFaceRig {
   setSpeechBoundary(index){if(this.voice.mode==='tts')this.voice.wordIndex=Math.max(0,Math.floor(index));}
   setMicrophone(mic){this.mic=mic;}
   winkEye(side='eye_left'){if(!['eye_left','eye_right'].includes(side))return false;this.forceEye=null;this.winkState={side,started:performance.now()};return true;}
-  setGaze(x,y){this.gaze.targetX=Math.max(-1,Math.min(1,x));this.gaze.targetY=Math.max(-1,Math.min(1,y));}
+  setGaze(x,y){this.gazeAuto=false;this.gaze.targetX=Math.max(-1,Math.min(1,x));this.gaze.targetY=Math.max(-1,Math.min(1,y));}
+  resumeIdleGaze(){this.gazeAuto=true;}
   setTestPose({eye=null,mouth=null,viseme='a'}={}){this.forceEye=eye;this.forceMouth=mouth;this.forceViseme=viseme;this.draw(performance.now());}
   start(){if(this.frame||!this.ready)return;const loop=t=>{this.draw(t);this.frame=requestAnimationFrame(loop);};this.frame=requestAnimationFrame(loop);}
   stop(){if(this.frame)cancelAnimationFrame(this.frame);this.frame=0;}
   draw(t){
     if(!this.ready)return;
-    const ctx=this.ctx,p=this.params,delta=Math.max(0,Math.min(.05,(t-this.lastTime)/1000||.016));this.lastTime=t;
+    const ctx=this.ctx,delta=Math.max(0,Math.min(.05,(t-this.lastTime)/1000||.016));this.lastTime=t;
+    this.renderParams=advanceFace(this.renderParams,this.params,delta,this.enabled);const p=this.renderParams;
     const active=this.enabled;
-    this.gaze.x+=(this.gaze.targetX-this.gaze.x)*Math.min(1,delta*6);
-    this.gaze.y+=(this.gaze.targetY-this.gaze.y)*Math.min(1,delta*6);
+    const idle=active&&this.gazeAuto?idleGaze(t-this.started):null;
+    const gx=idle?idle.x:this.gaze.targetX,gy=idle?idle.y:this.gaze.targetY;
+    this.gaze.x+=(gx-this.gaze.x)*Math.min(1,delta*5);
+    this.gaze.y+=(gy-this.gaze.y)*Math.min(1,delta*5);
+    this.stageTilt=active?idleBreath(t-this.started,this.emotion):0;
+    this.onFrame?.(this.stageTilt,p);
     ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.base_v07,0,0);
     // Eyebrow strokes are separately addressable. Keep displacement tiny while original bangs await artist cleanup.
     for(const side of ['brow_left','brow_right']){
@@ -72,11 +79,16 @@ export class RasterFaceRig {
       ctx.drawImage(this.parts[`${side}_sclera`],x,y,w,h);
       ctx.drawImage(this.parts[`${side}_iris`],x+gaze.x,y+gaze.y,w,h);
       // Lashes are in the foreground. This preserves the original ink edge.
-      ctx.drawImage(this.parts[`${side}_lashes`],x,y,w,h);
+      ctx.save();ctx.globalAlpha=.30+.70*smootherstep((openness-.23)/.57);
+      ctx.drawImage(this.parts[`${side}_lashes`],x,y,w,h);ctx.restore();
       ctx.restore();
-      if(openness<.95&&openness>.19)paintMovingLid(ctx,shape);
+      if(openness<.95&&openness>.19){
+        paintMovingLid(ctx,shape);
+        const crease=Math.max(0,1-Math.abs(openness-.55)/.35)*.35;
+        if(crease>.001){ctx.save();ctx.globalAlpha=crease;ctx.drawImage(this.parts[`${side}_fold`],x,y,w,h);ctx.restore();}
+      }
       const lidAlpha=eyeLidOpacity(openness);
-      if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_closed`],x,y,w,h);ctx.restore();}
+      if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_soft_closed`],x,y,w,h);ctx.restore();}
     }
     drawBlush(ctx,p.blush);
     let viseme='a',targetVoice=0;

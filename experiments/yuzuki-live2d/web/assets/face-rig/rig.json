@@ -61,7 +61,7 @@
     }
   },
   "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "additional_artwork": {
     "eye_left_closed": {
       "file": "eye_left_closed.webp",
@@ -84,12 +84,12 @@
       "use": "opacity-weighted wink/blink closure"
     }
   },
-  "prototype_source": "assets/face-rig/yuzuki-facial-prototype-v08.ora",
+  "prototype_source": "assets/face-rig/yuzuki-facial-prototype-v09.ora",
   "limitations": [
-    "Painted eyelashes are extracted from source, not hand-repainted geometry",
-    "No high-quality eye occlusion at extreme glances; gaze limited to <=3px",
-    "Only slight 2D lean, not head XY rotation or Cubism deformers",
-    "No Cubism PSD, .cmo3, or .moc3"
+    "Automatically repaired/segmented eyes still need an illustrator to rework extreme expression shapes",
+    "Canvas animation with art overlay only, not Cubism geometry or head XY turn",
+    "No independently hand-painted hidden areas beyond the repaired facial reference",
+    "No official PSD, .cmo3 or .moc3"
   ],
   "iris_centres": {
     "eye_left": [
@@ -128,5 +128,7 @@
     "eye_left": "eye_left_lashes.webp",
     "eye_right": "eye_right_lashes.webp"
   },
-  "blink_method": "Unscaled eye sprites + cubic bezier lid aperture + hidden closed-line artwork"
+  "blink_method": "Unscaled eye sprites + cubic bezier lid aperture + hidden closed-line artwork",
+  "lid_art": "2 softly repainted shut-eyes, plus independent crease art",
+  "idle_control": "slow interpolated expressions + bounded stationary saccades"
 }
