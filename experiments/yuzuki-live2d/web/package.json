@@ -1,12 +1,12 @@
 {
   "name": "yuzuki-character-lab",
-  "version": "1.9.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "Experimental local facial animation with audio-reactive mouth, not Cubism model",
   "scripts": {
     "dev": "python -m http.server 5173",
     "test": "node --test js/*.test.mjs",
-    "check": "node --check js/app.js && node --check js/character-engine.js && node --check js/review.js && node --check js/review-data.js && node --check js/story-director.js && node --check js/raster-face-rig.js && node --check js/eye-performance.js && node --check js/eye-aperture.js && node --check js/blink-v15.js && node --check js/performance-timeline.js && node --check js/face-performance.js && node --check js/facial-art.js && node --check js/audio-mouth.js && node --check js/eye-performance-v07.test.mjs && node --check js/companion.js && node --check js/interaction-director.js && node --check js/session-store.js && node --check js/widget.js && node --check js/widget-protocol.js && node --check js/embed-loader.js"
+    "check": "node --check js/app.js && node --check js/character-engine.js && node --check js/review.js && node --check js/review-data.js && node --check js/story-director.js && node --check js/raster-face-rig.js && node --check js/eye-performance.js && node --check js/eye-aperture.js && node --check js/blink-v15.js && node --check js/performance-timeline.js && node --check js/face-performance.js && node --check js/facial-art.js && node --check js/audio-mouth.js && node --check js/eye-performance-v07.test.mjs && node --check js/companion.js && node --check js/interaction-director.js && node --check js/session-store.js && node --check js/widget.js && node --check js/widget-protocol.js && node --check js/embed-loader.js && node --check js/blink-v20.js"
   }
 }

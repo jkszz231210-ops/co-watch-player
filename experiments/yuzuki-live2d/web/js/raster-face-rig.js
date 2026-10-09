@@ -5,9 +5,9 @@
 import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-performance.js';
 import {drawBlush,drawLips} from './facial-art.js';
 import {winkEnvelope} from './eye-performance.js';
-import {drawBlink,blinkClosure} from './blink-v15.js';
+import {drawBlink,blinkClosure} from './blink-v20.js';
 import {advanceFace,idleGaze,idleBreath,DEFAULT_FACE} from './performance-timeline.js';
-export const RIG_VERSION='1.9.0';
+export const RIG_VERSION='2.0.0';
 export const PART_BOXES={eye_left:[339,456,469,559],eye_right:[554,451,684,554],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
@@ -29,7 +29,7 @@ export class RasterFaceRig {
     const urls={portrait_base:'./assets/yuzuki-front-a.webp',mouth:`${this.assetRoot}/mouth.webp`};
     const loaded=await Promise.all(names.map(name=>getImage(urls[name])));
     names.forEach((name,i)=>this.parts[name]=loaded[i]);
-    this.parts.blinkAtlas=await getImage(`${this.assetRoot}/blink-v19/blink-atlas.webp`);this.ready=true;
+    this.parts.blinkAtlas=await getImage(`${this.assetRoot}/blink-v20/blink-atlas.webp`);this.ready=true;
     this.draw(performance.now());return this;
   }
   update(params,emotion=null){this.params={...this.params,...params};if(emotion)this.emotion=emotion;}

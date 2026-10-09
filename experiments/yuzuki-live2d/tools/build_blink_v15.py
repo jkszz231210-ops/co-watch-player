@@ -58,7 +58,7 @@ def line_curve(xx,pts):
     return np.interp(xx,pts[:,0],pts[:,1])
 
 
-def frame(side,c):
+def frame(side,c,draw_lash=True):
     spec=EYES[side];x0,y0,x1,y1=spec['box'];w,h=x1-x0,y1-y0
     rgba=np.zeros((h,w,4),dtype=np.uint8)
     if c==0:return rgba
@@ -92,7 +92,7 @@ def frame(side,c):
     positions=[((float(x)-x0)*S,(float(y)-y0)*S) for x,y in zip(vals,yy_top)]
     # No new line at the open state: existing real lash contours already look good.
     strength=float(smoothstep((c-.16)/.34))
-    if strength>.001:
+    if strength>.001 and draw_lash:
         brush.line(positions,fill=(101,73,90,int(186*strength)),width=max(2,round((1.45+1.0*c)*S)),joint='curve')
         if c>.75:
             s=(c-.75)/.25
