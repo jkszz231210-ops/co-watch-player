@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 WEB=ROOT/'web'
 TARGET=ROOT/'柚希-双击直接体验.html'
 MODULES=['face-performance','eye-aperture','eye-performance','performance-timeline',
-         'facial-art','character-engine','raster-face-rig','companion']
+         'facial-art','character-engine','raster-face-rig','interaction-director','session-store','companion']
 
 
 def compile_module(name):
@@ -24,7 +24,7 @@ def compile_module(name):
         if not spec.startswith('./') or not spec.endswith('.js'):
             raise ValueError('Unexpected module dependency: '+spec)
         return f"const {{{bindings}}}=__require__('{spec[2:-3]}');"
-    code=re.sub(r"^import\s*\{([^}]+)\}\s*from\s*['\"]([^'\"]+)['\"];\s*",import_replacer,code,flags=re.M)
+    code=re.sub(r"^import[ \t]*\{([^}]+)\}[ \t]*from[ \t]*['\"]([^'\"]+)['\"];[ \t]*(?:\r?\n)?",lambda m: import_replacer(m)+"\n",code,flags=re.M)
     exports=re.findall(r'^export\s+(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)',code,re.M)
     code=re.sub(r'^export\s+(?=(?:const|let|function|class)\s)', '', code,flags=re.M)
     if re.search(r'^\s*(?:import |export )',code,re.M):

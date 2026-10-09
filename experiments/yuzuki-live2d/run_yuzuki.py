@@ -70,10 +70,10 @@ def main():
     args=parser.parse_args()
     validate()
     if args.check:
-        print('PASS: 柚希 V1.0 演示版文件齐全，主视觉已锁定');return
+        print('PASS: 柚希 V1.1 演示版文件齐全，主视觉已锁定');return
     with http.server.ThreadingHTTPServer(('127.0.0.1',args.port),CompanionHandler) as server:
         url=f'http://127.0.0.1:{server.server_address[1]}/companion.html'
-        print('柚希 V1.0 已启动：',url,flush=True)
+        print('柚希 V1.1 已启动：',url,flush=True)
         print('AI 服务：', '已配置' if config()['enabled'] else '未配置，使用离线演示',flush=True)
         print('Ctrl+C 关闭本地服务',flush=True)
         if not args.no_browser:webbrowser.open(url)

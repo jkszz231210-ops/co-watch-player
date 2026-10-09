@@ -1,12 +1,17 @@
 import {CharacterEngine,localReply,findExpression} from './character-engine.js';
 import {RasterFaceRig} from './raster-face-rig.js';
+import {planReaction} from './interaction-director.js';
+import {loadSaved,saveHistory,clearHistory} from './session-store.js';
 
 const $=id=>document.getElementById(id);
 const rig=new RasterFaceRig($('rigCanvas'));
 let activeEmotion='smile';
 let motionEnabled=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let voiceEnabled=false, aiConnected=false, busy=false, demoGeneration=0, currentlySpeaking=null;
-const messages=[];
+const localStorageSafe=()=>{try{return window.localStorage;}catch{return null;}};
+const saved=loadSaved(localStorageSafe());
+const messages=[...saved.messages];
+let remember=saved.enabled;
 const engine=new CharacterEngine((parameters, emotion)=>{
   rig.update(parameters,emotion?.id);
   const p=parameters.headTilt;
@@ -20,6 +25,12 @@ function mood(id){
   $('emotionReadout').textContent=`♡ ${findExpression(activeEmotion).name}地陪着你`;
 }
 function status(text){$('feedback').textContent=text;}
+function persist(){if(remember&&!saveHistory(localStorageSafe(),true,messages))status('此浏览器拒绝本地存储；本次对话仍可继续。');}
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function act(emotion){
+  const cues=planReaction(emotion,{reduceMotion:!motionEnabled});
+  for(const cue of cues){mood(cue.emotion);if(cue.duration)await sleep(cue.duration);}
+}
 function bubble(role,text){
   const root=document.createElement('div');root.className=`bubble ${role==='assistant'?'bot':'user'}`;
   const title=document.createElement('span');title.className='bubble-head';title.textContent=role==='assistant'?'柚希 · 刚刚':'你';
@@ -55,8 +66,10 @@ async function send(text,{scripted=false}={}){
   try{result=aiConnected?await connectedReply(cleaned):localReply(cleaned);}
   catch(error){result=localReply(cleaned);status(`AI 暂不可用，已切换本地演示。`);}
   messages.push({role:'user',content:cleaned});messages.push({role:'assistant',content:result.text});
-  if(messages.length>20)messages.splice(0,messages.length-20);
-  bubble('assistant',result.text);mood(result.emotion);
+  if(messages.length>30)messages.splice(0,messages.length-30);
+  persist();
+  await act(result.emotion);
+  bubble('assistant',result.text);
   if(voiceEnabled)speak(result.text);else status(aiConnected?'可继续聊天。':'本地演示回复，接入模型后可以自由交流。');
   busy=false;$('sendButton').disabled=false;$('chatInput').focus();
 }
@@ -71,7 +84,7 @@ async function fetchStatus(){
     status(aiConnected?`已连接 ${data.model||'模型'}，现在可以自由聊天。`:'演示可直接使用；连接 AI 后支持自由聊天。');
   }catch{aiConnected=false;}
 }
-function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+
 async function demo(){
   if(busy)return;
   const token=++demoGeneration;
@@ -86,7 +99,7 @@ async function demo(){
   for(const step of steps){
     if(token!==demoGeneration)break;
     bubble('assistant',step.line);mood(step.emotion);if(voiceEnabled)speak(step.line);
-    await wait(step.pause);
+    await sleep(step.pause);
   }
   $('demoButton').disabled=false;
   if(token===demoGeneration)status('演出结束，可以直接和柚希聊天。');
@@ -119,6 +132,28 @@ if(Recognition){$('recognitionButton').addEventListener('click',()=>{
   recog.onresult=e=>{$('chatInput').value=e.results[0][0].transcript;$('chatInput').focus();status('识别完成，确认文字后即可发送。');};
   recog.onerror=e=>status(`语音输入不可用：${e.error}`);recog.start();status('正在聆听……');
 });}else{$('recognitionButton').disabled=true;$('recognitionButton').title='当前浏览器不支持语音识别';}
+$('captureButton').addEventListener('click',()=>{
+  try{
+    const image=rig.ready?rig.canvas:$('portraitFallback');
+    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=1536;
+    const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0,1024,1536);
+    const a=document.createElement('a');a.download='柚希-此刻.png';a.href=canvas.toDataURL('image/png');a.click();
+    status('此刻的柚希已经保存为 PNG。');
+  }catch(error){status('浏览器阻止了图片保存，请换用 Edge 或 Chrome 再试。');}
+});
+$('rememberCheck').checked=remember;
+if(messages.length){for(const message of messages)bubble(message.role,message.content);status(`已恢复 ${messages.length} 条本地对话。`);}
+$('rememberCheck').addEventListener('change',event=>{
+  remember=Boolean(event.target.checked);
+  const okay=saveHistory(localStorageSafe(),remember,messages);
+  if(!okay&&remember){remember=false;event.target.checked=false;}
+  status(remember?'已允许在本机浏览器保存最近 30 条对话。':(okay?'已关闭并删除保存的历史记录。':'浏览器不允许本地保存。'));
+});
+$('clearHistoryButton').addEventListener('click',()=>{
+  clearHistory(localStorageSafe());messages.length=0;
+  $('chat').replaceChildren();bubble('assistant','记录已清空。我们从这一刻重新开始吧。♡');
+  status('本地保存的聊天记录已清空。');
+});
 $('helpButton').addEventListener('click',()=>$('aboutDialog').showModal());
 $('aboutClose').addEventListener('click',()=>$('aboutDialog').close());
 $('aboutDialog').addEventListener('click',e=>{if(e.target===$('aboutDialog'))$('aboutDialog').close();});
