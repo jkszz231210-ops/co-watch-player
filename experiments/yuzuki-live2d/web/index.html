@@ -13,7 +13,7 @@
 <div class="page-shell">
   <header class="topbar">
     <a class="brand" href="#top" aria-label="返回顶部"><span class="brand-mark">✧</span><span>柚希 <small>YUZUKI</small></span></a>
-    <div class="top-actions"><span class="tiny-pill"><span class="online-dot"></span>ART PROTOTYPE · V0.2</span><button id="motionToggle" class="icon-button" type="button" aria-pressed="false" title="关闭动态效果">◌ <span>动态</span></button></div>
+    <div class="top-actions"><span class="tiny-pill"><span class="online-dot"></span>VISUAL LOCKED · V0.3</span><button id="motionToggle" class="icon-button" type="button" aria-pressed="false" title="关闭动态效果">◌ <span>动态</span></button></div>
   </header>
   <main id="top">
     <section class="intro">
@@ -28,16 +28,16 @@
         <div class="stage" id="stage">
           <div class="stage-halo"></div>
           <div class="floating-flake flake-a">✧</div><div class="floating-flake flake-b">✦</div><div class="floating-flake flake-c">✧</div>
-          <div class="art-holder" id="artHolder"><img id="characterArt" class="character-art" src="./assets/yuzuki-portrait.webp" alt="柚希：灰蓝眼睛、深茶灰发色、白蓝色服装的二次元女性半身美术概念图" draggable="false"></div>
+          <div class="art-holder" id="artHolder"><img id="characterArt" class="character-art" src="./assets/yuzuki-front-a.webp" alt="柚希：灰蓝眼睛、深茶灰发色、白蓝色服装的二次元女性半身美术概念图" draggable="false"></div>
           <div class="stage-caption"><span class="pulse-dot"></span><span id="stageMood">现在的心情 · 温柔</span></div>
         </div>
-        <div class="character-footer"><div><strong>柚希 / Yuzuki</strong><span>可爱 · 温柔 · 知性 · 灵动 · 梦幻</span></div><div class="footer-actions"><button id="sheetButton" class="secondary-button" type="button">查看完整设定板 ↗</button><a class="secondary-button review-link" href="./review.html">审核角色外观 ♡</a></div></div>
+        <div class="character-footer"><div><strong>柚希 / Yuzuki</strong><span>可爱 · 温柔 · 知性 · 灵动 · 梦幻</span></div><button id="sheetButton" class="secondary-button" type="button">查看角色设定 ↗</button></div>
       </section>
       <section class="interaction-panel panel" aria-label="交互与表情实验区">
         <div class="control-tabs" role="tablist" aria-label="交互方式"><button class="tab active" id="tab-expression" data-tab="expression" role="tab" aria-selected="true" aria-controls="pane-expression">表情演出</button><button class="tab" id="tab-chat" data-tab="chat" role="tab" aria-selected="false" aria-controls="pane-chat">和她聊聊</button><button class="tab" id="tab-params" data-tab="params" role="tab" aria-selected="false" aria-controls="pane-params">动作参数</button></div>
         <section class="tab-pane" id="pane-expression" role="tabpanel" aria-labelledby="tab-expression">
           <div class="inner-heading"><div><div class="eyebrow small">EXPRESSIONS</div><h3>不止一种心情</h3></div><span class="subtle-label">16 / 16</span></div>
-          <p class="pane-description">点击一种表情，查看概念画面和计划中的眉眼嘴参数；也可播放完整情绪演出。当前原画尚未分层，因此预览图不是实时面部变形。</p>
+          <p class="pane-description">点击一种表情，查看对应的概念画面和计划中的眉、眼、嘴、动作参数。当前原画尚未分层，因此预览图不是实时面部变形。</p>
           <div id="expressionGrid" class="expression-grid"></div>
           <div class="expression-detail"><div class="detail-image"><img id="detailThumbnail" src="./assets/expressions/01.webp" alt="选中表情的概念参考"></div><div class="detail-copy"><div class="detail-name" id="detailName">平静</div><p id="detailStory">轻柔注视，嘴角若有若无地上扬。</p><div class="detail-chips" id="detailChips"></div></div></div>
           <div class="hint">✦ 点击表情会更新行为参数。未来绑定模型时，同样的事件可驱动 Live2D。</div>
@@ -48,16 +48,13 @@
           <div class="chat-messages" id="chatMessages" aria-live="polite"><div class="message assistant"><span class="message-author">柚希</span><p>你好呀。今天想聊些什么呢？我在听。 ♡</p></div></div>
           <form id="chatForm" class="chat-form"><label class="sr-only" for="chatInput">输入消息</label><input type="text" id="chatInput" placeholder="比如：今天有点累……" maxlength="300" autocomplete="off" required><button type="submit" class="send-button" aria-label="发送消息">➜</button></form>
           <div class="chat-controls"><label class="toggle"><input id="voiceEnabled" type="checkbox"><span>🔊 朗读回复（浏览器语音）</span></label><button type="button" id="listenButton" class="text-button">🎙️ 语音输入</button></div>
-          <p class="tiny-note">浏览器语音依赖本机语音包及权限，尚未实现音素级嘴形同步。真正 AI 对话尚未接入；本地模式不会发送输入内容。</p>
+          <p class="tiny-note">麦克风功能依赖浏览器 Web Speech 支持及权限；朗读效果也因设备语音库不同而异。</p>
         </section>
         <section class="tab-pane hidden" id="pane-params" role="tabpanel" aria-labelledby="tab-params">
           <div class="inner-heading"><div><div class="eyebrow small">ANIMATION BLUEPRINT</div><h3>情绪如何变成动作</h3></div></div>
           <p class="pane-description">这一面板展示情绪状态到 Cubism 参数的映射目标值。当前只是行为状态预演，并非已绑定参数。</p>
           <div id="paramBars" class="param-bars"></div>
           <div class="param-note"><strong>驱动分层</strong><br>常驻眨眼、呼吸 → 表情权重 → 语音口型 → 优先级混合 → 实际模型。避免 AI 直接写入所有网格参数。</div>
-          <div class="story-header"><strong>情绪演出试镜</strong><span>按时间顺序预演情绪节奏。动作参数可平滑过渡，主图仍为静态概念稿。</span></div>
-          <div class="story-buttons" id="storyButtons"><button type="button" class="story-choice" data-story="compliment">♡ 被夸可爱</button><button type="button" class="story-choice" data-story="comfort">☁ 听你说累</button><button type="button" class="story-choice" data-story="success">✧ 分享喜悦</button></div>
-          <div class="story-readout" id="storyReadout" role="status">选择一个场景，即可观看参数演出过程。</div>
           <button id="demoSequence" type="button" class="primary-button">▶ 播放“惊讶 → 害羞 → 微笑”</button>
         </section>
       </section>

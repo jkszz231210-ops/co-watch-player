@@ -1,0 +1,35 @@
+{
+  "schema": "yuzuki.art-direction.lock.v1",
+  "version": "0.3.0",
+  "approved": true,
+  "source": "User selected the middle portrait in conversation on 2026-10-09",
+  "candidateId": "front-a",
+  "candidateName": "银花晨光",
+  "sourceImage": "assets/source/yuzuki-front-a.png",
+  "sourceSha256": "5ecb00c0b580ede77d9629d37925cb6dce7d394888d83bd121b3ee6cfbd8f478",
+  "webImage": "web/assets/yuzuki-front-a.webp",
+  "aesthetic": {
+    "genre": "日系精致动画风",
+    "qualities": [
+      "可爱",
+      "温柔陪伴",
+      "清冷知性",
+      "灵动",
+      "略带梦幻感"
+    ],
+    "eyes": "灰蓝色",
+    "hair": "深灰茶色长发",
+    "outfit": "白蓝色精致日常连衣裙"
+  },
+  "workflow": {
+    "approvalMode": "ship-then-review",
+    "defaultBehavior": "Proceed with reversible implementation based on approved portrait without repeated aesthetic confirmation.",
+    "userRole": "Review working deliverables and request revisions when needed.",
+    "requiresApprovalOnlyFor": [
+      "不可逆或高风险外部操作",
+      "新增付费服务或费用",
+      "不能从现有信息合理推断的重大方向变化"
+    ]
+  },
+  "scope": "Visual art direction approved. Does not imply separate PSD art layers, Cubism mesh rig, or finished Live2D model."
+}

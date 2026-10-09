@@ -13,7 +13,7 @@ export const CRITERIA = Object.freeze([
   {id:'rig',title:'Live2D 友好度',description:'对称、五官清晰、遮挡较少'}
 ]);
 export const clampRating=(v)=>Math.min(5,Math.max(1,Math.round(Number(v)||3)));
-export const makeInitialReview=()=>({version:2,selected:'front-a',scores:Object.fromEntries(CANDIDATES.map(c=>[c.id,Object.fromEntries(CRITERIA.map(x=>[x.id,3]))])),notes:'',decision:'pending'});
+export const makeInitialReview=()=>({version:2,selected:'front-a',scores:Object.fromEntries(CANDIDATES.map(c=>[c.id,Object.fromEntries(CRITERIA.map(x=>[x.id,3]))])),notes:'',decision:'approve'});
 export function validateReview(value){const x=makeInitialReview();if(!value||typeof value!=='object')return x;
   if(CANDIDATES.some(c=>c.id===value.selected))x.selected=value.selected;
   for(const c of CANDIDATES){for(const criterion of CRITERIA){x.scores[c.id][criterion.id]=clampRating(value.scores?.[c.id]?.[criterion.id]);}}

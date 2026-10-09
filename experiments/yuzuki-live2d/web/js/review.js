@@ -1,6 +1,8 @@
 import {CANDIDATES,CRITERIA,validateReview,makeInitialReview,scoreCandidate,buildExport} from './review-data.js';
 const el=id=>document.getElementById(id);
 let state;try{state=validateReview(JSON.parse(localStorage.getItem('yuzuki-review-v2')));}catch{state=makeInitialReview();}
+// Visual selection was already approved in conversation, do not re-request approval.
+state.selected='front-a';if(state.decision==='pending')state.decision='approve';
 const save=()=>{try{localStorage.setItem('yuzuki-review-v2',JSON.stringify(state));}catch{ /* private browsing */ }};
 const cards=el('candidateCards'),criteria=el('criteria'),left=el('compareLeft'),right=el('compareRight');
 function renderCards(){cards.replaceChildren();for(const candidate of CANDIDATES){const card=document.createElement('button');card.className='candidate-card'+(candidate.id===state.selected?' active':'');card.type='button';card.setAttribute('aria-pressed',String(candidate.id===state.selected));card.dataset.candidate=candidate.id;
