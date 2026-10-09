@@ -16,7 +16,7 @@
 
 **核心升级：眼睛不再整块跟着视线位移。** 新增左右虹膜、眼白/固定眼线、左右眉毛独立纹理，允许极小幅注视与眉毛情绪动作。保留原有脸部、眨眼、单眼 Wink、5 种嘴型、麦克风功能，发布 10 层 OpenRaster 试验素材。
 
-- 查看 [六种虹膜/眉毛状态对照](assets/face-rig/qa-eye-detail-v07.jpg) 与 [虹膜注视短动画](assets/face-rig/yuzuki-iris-gaze-v07.gif)。这两者是离线素材合成，不是实时浏览器录像。
+- 查看 [六种虹膜/眉毛状态对照](assets/face-rig/qa-eye-detail-v07.jpg) 与 [虹膜注视短动画](assets/face-rig/yuzuki-iris-gaze-v07-compact.gif)。这两者是离线素材合成，不是实时浏览器录像。
 - 在网页「动作参数」点击“看向左边 / 看向右边 / 恢复视线”，也可在角色区域内移动鼠标。
 - 要重建素材，查看 [V0.7 图层生产与局限](docs/14-iris-eyebrows-v07.md)，执行 `tools/build_eye_detail_v07.py`。
 - **限制**：由于刘海挡住部分眉毛，现阶段自动分层并非最终画师级 PSD，尚未完成 Cubism 导入；全页面 Chromium 自动测试受到环境阻止。
