@@ -1,0 +1,47 @@
+{
+  "version": "1.9",
+  "character": "Yuzuki",
+  "source": "assets/source/yuzuki-front-a.png",
+  "approved_sha256": "5ecb00c0b580ede77d9629d37925cb6dce7d394888d83bd121b3ee6cfbd8f478",
+  "psd": "yuzuki-eye-keyforms-v1.9.psd",
+  "pose_layers": 4,
+  "total_psd_layers": 6,
+  "poses": [
+    "open",
+    "half",
+    "closed"
+  ],
+  "atlas": "web/assets/face-rig/blink-v19/blink-atlas.webp",
+  "atlas_size": [
+    4032,
+    320
+  ],
+  "frames": 21,
+  "states": [
+    0.0,
+    0.05,
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "pixel_identical_open": true,
+  "actual_cubism_model": false,
+  "cubism_import_verified": false,
+  "limitation": "Half/closed eyelids are refined algorithmic artwork studies, not professionally hand-drawn keyforms; must be artist-approved before Cubism rig."
+}
