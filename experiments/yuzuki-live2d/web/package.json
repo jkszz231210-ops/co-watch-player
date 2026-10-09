@@ -1,12 +1,12 @@
 {
   "name": "yuzuki-character-lab",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
-  "description": "Experimental editable ORA facial layer rig, not Cubism model",
+  "description": "Experimental local facial animation with audio-reactive mouth, not Cubism model",
   "scripts": {
     "dev": "python -m http.server 5173",
     "test": "node --test js/*.test.mjs",
-    "check": "node --check js/app.js && node --check js/character-engine.js && node --check js/review.js && node --check js/review-data.js && node --check js/story-director.js && node --check js/raster-face-rig.js"
+    "check": "node --check js/app.js && node --check js/character-engine.js && node --check js/review.js && node --check js/review-data.js && node --check js/story-director.js && node --check js/raster-face-rig.js && node --check js/face-performance.js && node --check js/facial-art.js && node --check js/audio-mouth.js"
   }
 }
