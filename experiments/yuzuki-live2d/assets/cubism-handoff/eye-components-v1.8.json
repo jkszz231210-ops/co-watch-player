@@ -1,0 +1,66 @@
+{
+  "version": "1.8",
+  "format": "layered PSD art study",
+  "approved_source": "assets/source/yuzuki-front-a.png",
+  "approved_sha256": "5ecb00c0b580ede77d9629d37925cb6dce7d394888d83bd121b3ee6cfbd8f478",
+  "psd": "yuzuki-eye-components-v1.8.psd",
+  "dimensions": [
+    1024,
+    1536
+  ],
+  "total_layers": 10,
+  "visible_layers": 7,
+  "hidden_layers": 3,
+  "cubism_model": false,
+  "cubism_import_tested": false,
+  "production_ready": false,
+  "rest_art_fidelity": {
+    "rgb_mae": 5.086263020833333e-06,
+    "pixels_changed_gt_2": 0,
+    "max_channel_difference": 1
+  },
+  "irises": {
+    "eye_left": {
+      "center": [
+        402,
+        502
+      ],
+      "radii": [
+        29,
+        36
+      ],
+      "coverage_pixels": 3399,
+      "file": "eye_left-iris-v1.8.png"
+    },
+    "eye_right": {
+      "center": [
+        609,
+        486
+      ],
+      "radii": [
+        34,
+        34
+      ],
+      "coverage_pixels": 3761,
+      "file": "eye_right-iris-v1.8.png"
+    }
+  },
+  "upper_eyeliners": {
+    "eye_left": {
+      "coverage_pixels": 1679,
+      "file": "eye_left-upper_ink-v1.8.png"
+    },
+    "eye_right": {
+      "coverage_pixels": 1794,
+      "file": "eye_right-upper_ink-v1.8.png"
+    }
+  },
+  "qa": "yuzuki-eye-components-qa-v1.8.jpg",
+  "limits": [
+    "Iris/eyeliner masks derived from the original flattened artwork, not hand-painted source layers.",
+    "Hair strands, eyelid paint and highlights are not separately reconstructed in full.",
+    "Underpaint beneath iris/ink is algorithmic and imperfect when an iris is displaced.",
+    "No Cubism deformation mesh, .cmo3, .moc3 or head-angle keyforms have been created.",
+    "PSD has not been validated by importing it into Cubism Editor."
+  ]
+}

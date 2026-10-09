@@ -1,3 +1,8 @@
+
+## V1.8 · 眼部三层拆分实验（2026-10-09）
+
+新增 `assets/cubism-handoff/yuzuki-eye-components-v1.8.psd`：每只眼的虹膜/上眼线/眼部底层是可编辑层，静态重组基本不改变经审核的原画；包括隐藏闭眼草稿和原画，一共 10 层。请阅读 [V1.8 眼部分层说明](docs/23-v18-iris-ink-decomposition.md)；**尚非正式 Cubism 模型，虹膜移动所需的底色与刘海遮挡仍需手绘精修**。
+
 # V1.7：左右眼真正独立的 Cubism 美术准备稿（2026-10-09）
 
 新增 `assets/cubism-handoff/yuzuki-eye-separated-v1.7.psd`：**左眼和右眼可见且独立，皮肤补画为底层**，闭眼关键形草稿独立隐藏。6 个实际 PSD 图层、1024×1536、合成睁眼完全保留经审核立绘的每个像素。可用 Krita/Photoshop 打开查看，详情和限制见 [`docs/22-actual-eyes-psd-v17.md`](docs/22-actual-eyes-psd-v17.md)。
