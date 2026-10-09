@@ -16,7 +16,7 @@
 
 **Windows 双击 `一键体验柚希.cmd`**（需系统 Python 3），进入页面后切换「动作参数」并点击「眨眼一次」「张嘴一下」。不想运行任何程序也可以直接打开 `assets/face-rig/yuzuki-face-motion-preview.gif` 观看实际分层合成的离线短动画。
 
-如需修改眼、嘴位置和遮罩，可以在 Krita 或 GIMP 中打开 `assets/face-rig/yuzuki-facial-prototype.ora`，详情见 `docs/10-real-facial-layers.md`。
+如需修改眼、嘴位置和遮罩，完整 ZIP 中可直接用 Krita 或 GIMP 打开 `assets/face-rig/yuzuki-facial-prototype.ora`。GitHub 代码分支含一键再生成它的脚本（`pip install -r tools/requirements.txt` 后运行 `python tools/build_face_rig.py`），详情见 `docs/10-real-facial-layers.md`。
 
 ## 可选：需要修改时才使用美术审核台
 
@@ -34,7 +34,7 @@
 | 角色设定板 | ✅ 概念稿 | 表情、三视图、服装、分层意向图。**其中 PSD 和目录截图只是绘制示意** |
 | 16 种表情参考 | ✅ 静态素材 | 从概念板裁切，仅作为美术与情绪参考，不是独立可变形图层 |
 | 网页交互实验室 | ✅ 代码完成 | 真正独立眼/嘴图层 Canvas 动画、自动眨眼、说话驱动张嘴、16 态预览与三段情绪演出（浏览器图形验收待复核） |
-| OpenRaster 透明分层 | ✅ 试验可编辑 | `assets/face-rig/yuzuki-facial-prototype.ora` 共 4 层：自动修复底图、左右眼、嘴部。**自动抠图/补绘，不是正式高精 PSD。** |
+| OpenRaster 透明分层 | ✅ 试验可编辑 | 完整 ZIP 中 `assets/face-rig/yuzuki-facial-prototype.ora` 共 4 层：自动修复底图、左右眼、嘴部。GitHub 端由 `tools/build_face_rig.py` 重建。**不是正式高精 PSD。** |
 | 离线动画预览 | ✅ 已生成 | `assets/face-rig/yuzuki-face-motion-preview.gif`，可无需运行服务查看 |
 | **美术审核台** | ✅ 代码完成 | 三套候选、并排对比、6 项打分、浏览器本地保存、导出 JSON |
 | 行为引擎 | ✅ 原型 | 与渲染器分离的情绪→参数映射，包含单元测试 |

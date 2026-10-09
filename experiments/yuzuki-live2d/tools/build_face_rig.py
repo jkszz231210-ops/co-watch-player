@@ -34,6 +34,8 @@ for key,opt in REGIONS.items():
  m=np.zeros_like(mask_all);cv2.ellipse(m,((a+c)//2,(b+d)//2),((c-a)//2-4,(d-b)//2-4),0,0,360,255,-1)
  mask_all=cv2.bitwise_or(mask_all,m)
  patch=IMAGE.copy();patch.putalpha(alpha)
+ # Strip hidden RGB colour before storing sparse PNG layers. Visible pixels remain identical.
+ packed=np.array(patch);packed[packed[:,:,3]==0,:3]=0;patch=Image.fromarray(packed,'RGBA')
  patch_crop=patch.crop((x0,y0,x1,y1));patch_crop.save(OUT/f'{key}.png',optimize=True)
  patches[key]=patch
  info['regions'][key]={'box':opt['box'],'centre':[(x0+x1)/2,(y0+y1)/2],'canvas_box':[a,b,c,d]}
@@ -72,7 +74,6 @@ with zipfile.ZipFile(ora,'w') as z:
   src=f'data/layer{i}.png';bio=io.BytesIO();im.save(bio,format='PNG');z.writestr(src,bio.getvalue());
   ET.SubElement(st,'layer',{'name':label,'src':src,'x':'0','y':'0','opacity':'1.0','visibility':'visible','composite-op':'svg:src-over'})
  z.writestr('stack.xml',ET.tostring(stack,encoding='utf-8',xml_declaration=True))
- bio=io.BytesIO();Image.alpha_composite(base_img,Image.alpha_composite(Image.alpha_composite(patches['eye_left'],patches['eye_right']),patches['mouth'])).save(bio,format='PNG') # preview is also separately below
  # composite should be base underneath overlays
  preview=base_img.copy()
  for k in ['eye_left','eye_right','mouth']:preview=Image.alpha_composite(preview,patches[k]);
