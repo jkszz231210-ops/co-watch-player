@@ -10,7 +10,7 @@ $('characterArt').src=approvedPortraitPath(); // User-approved direction, never 
 const rig=new RasterFaceRig($('faceRigCanvas'));
 const mic=new MicrophoneMouth();rig.setMicrophone(mic);
 rig.load().then(()=>{rig.start();$('faceRigCanvas').classList.remove('hidden');$('characterArt').classList.add('hidden');}).catch(error=>{console.warn('独立五官素材加载失败，保留原图。',error);});
-const engine=new CharacterEngine((parameters,emotion)=>{rig.update(parameters);for(const [name,value]of Object.entries(parameters)){const control=barElements.get(name);if(!control)continue;const minimum=name==='smile'?-1:0;const max=name==='headTilt'?1:1;const normalized=clamp((value-minimum)/(max-minimum),0,1);control.bar.style.width=`${Math.round(normalized*100)}%`;control.value.textContent=value.toFixed(2);}});
+const engine=new CharacterEngine((parameters,emotion)=>{rig.update(parameters,emotion?.id);for(const [name,value]of Object.entries(parameters)){const control=barElements.get(name);if(!control)continue;const minimum=name==='smile'?-1:0;const max=name==='headTilt'?1:1;const normalized=clamp((value-minimum)/(max-minimum),0,1);control.bar.style.width=`${Math.round(normalized*100)}%`;control.value.textContent=value.toFixed(2);}});
 for(const [key,label]of Object.entries(PARAM_LABELS)){const element=document.createElement('div');element.className='param-line';const head=document.createElement('div'),name=document.createElement('span'),value=document.createElement('span'),background=document.createElement('div'),fill=document.createElement('div');name.textContent=label;value.textContent='0.00';head.append(name,value);background.className='bar-bg';fill.className='bar-fill';background.append(fill);element.append(head,background);bars.append(element);barElements.set(key,{bar:fill,value});}
 for(const emotion of EXPRESSIONS){const button=document.createElement('button');button.type='button';button.className='expression-option';button.dataset.emotion=emotion.id;button.setAttribute('aria-label',`选择${emotion.name}表情`);const img=document.createElement('img');img.src=`./assets/expressions/${String(emotion.index+1).padStart(2,'0')}.webp`;img.loading='lazy';img.alt='';const label=document.createElement('span');label.textContent=emotion.name;button.append(img,label);button.addEventListener('click',()=>selectEmotion(emotion.id));grid.append(button);}
 function selectEmotion(id){selected=id;const emotion=engine.setEmotion(id);for(const b of grid.children){const isSelected=b.dataset.emotion===id;b.classList.toggle('selected',isSelected);b.setAttribute('aria-pressed',String(isSelected));}detailImage.src=`./assets/expressions/${String(emotion.index+1).padStart(2,'0')}.webp`;detailImage.alt=`${emotion.name}表情的静态概念图`;detailName.textContent=emotion.name;detailStory.textContent=emotion.story;detailChips.replaceChildren(...emotion.tags.map(t=>{const e=document.createElement('span');e.textContent=t;return e;}));stageMood.textContent=`现在的心情 · ${emotion.name}`;const gentleAngle=clamp((emotion.parameters.headTilt-.2)*1.9,-1.2,1.2);art.style.setProperty('--emotion-tilt',`${gentleAngle.toFixed(2)}deg`);}
@@ -35,6 +35,8 @@ let trialTimer;
 function trial(pose,hold=540){if(trialTimer)clearTimeout(trialTimer);rig.setTestPose(pose);trialTimer=setTimeout(()=>rig.setTestPose({eye:null,mouth:null}),hold);}
 $('blinkTest').addEventListener('click',()=>trial({eye:.08},320));
 $('mouthTest').addEventListener('click',()=>trial({mouth:.8,viseme:'a'},700));
+$('winkLeftTest').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});rig.winkEye('eye_left');});
+$('winkRightTest').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});rig.winkEye('eye_right');});
 for(const button of document.querySelectorAll('[data-viseme]'))button.addEventListener('click',()=>trial({mouth:.85,viseme:button.dataset.viseme},900));
 $('restorePose').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});});
 const microphoneButton=$('microphoneMouth'),audioStatus=$('audioStatus');
@@ -48,7 +50,7 @@ microphoneButton.addEventListener('click',async()=>{
 });
 $('faceSnapshot').addEventListener('click',()=>{
  if(!rig.ready){audioStatus.textContent='正在加载角色素材，稍后再试。';return;}
- const link=document.createElement('a');link.download='Yuzuki-v0.5-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
+ const link=document.createElement('a');link.download='Yuzuki-v0.6-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
 });
 // Pointer-follow is subtle and can be switched off through the motion control.
 $('stage').addEventListener('pointermove',event=>{

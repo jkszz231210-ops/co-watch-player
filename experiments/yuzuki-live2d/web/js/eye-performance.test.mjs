@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {winkEnvelope,blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,eyeOffsetsFromGaze} from './eye-performance.js';
+test('wink has smooth attack, hold and release',()=>{assert.equal(winkEnvelope(-1),0);assert.equal(winkEnvelope(0),0);assert.equal(winkEnvelope(800),0);assert.ok(winkEnvelope(180)>.9);assert.equal(winkEnvelope(300),1);assert.ok(winkEnvelope(600)<.5);});
+test('wink is unilateral',()=>{const left=eyePose({wink:1,side:'eye_left'}),right=eyePose({wink:0,side:'eye_right'});assert.ok(left<.05&&right>.8);});
+test('curious has subtle asymmetric eyes',()=>{const a=eyePose({emotion:'curious',side:'eye_left'}),b=eyePose({emotion:'curious',side:'eye_right'});assert.ok(a>b);});
+test('smile creates eye squint while surprise widens',()=>{const b=eyePose({emotionEye:.44});assert.ok(eyePose({emotionEye:.44,smile:1})<b);assert.ok(eyePose({emotion:'surprise',emotionEye:.44})>b);});
+test('blink channels are independent and finite',()=>{for(let t=0;t<20000;t+=37)for(const side of ['eye_left','eye_right']){const b=blinkForSide(t,side);assert.ok(b>=0&&b<=1);const p=eyePose({blink:b,side});assert.ok(p>=.035&&p<=1);}});
+test('lid and original art crossfade during closing',()=>{assert.equal(eyeLidOpacity(1),0);assert.equal(eyeArtOpacity(0),0);assert.equal(eyeLidOpacity(0),1);});
+test('gaze never drags eyeliner more than a pixel',()=>{assert.deepEqual(eyeOffsetsFromGaze(9,-9),{x:.6,y:-.35});});

@@ -1,10 +1,11 @@
 /**
- * V0.5 artwork-preserving raster facial renderer.
+ * V0.6 artwork-preserving raster facial renderer.
  * True independently animated eye and lip art; NOT a Cubism .moc3 or simulated 3D turn.
  */
 import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-performance.js';
-import {drawEyelid,drawBlush,drawLips} from './facial-art.js';
-export const RIG_VERSION='0.5.0';
+import {drawBlush,drawLips} from './facial-art.js';
+import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,eyeOffsetsFromGaze,winkEnvelope} from './eye-performance.js';
+export const RIG_VERSION='0.6.0';
 export const PART_BOXES={eye_left:[338,460,468,555],eye_right:[551,435,695,540],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
@@ -19,15 +20,15 @@ export class RasterFaceRig {
     this.enabled=true;this.forceEye=null;this.forceMouth=null;this.forceViseme='a';this.started=performance.now();this.frame=0;
     this.voice={text:'',started:0,wordIndex:0,mode:'off'};
     this.mic=null;this.gaze={x:0,y:0,targetX:0,targetY:0};
-    this.smoothedVoice=0;this.lastTime=0;
+    this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;
   }
   async load(){
-    const names=['base','eye_left','eye_right','mouth'];
-    const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}.webp`)));
+    const names=['base','eye_left','eye_right','mouth','eye_left_closed','eye_right_closed'];
+    const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}${name.endsWith('_closed')?'.svg':'.webp'}`)));
     names.forEach((name,i)=>this.parts[name]=loaded[i]);this.ready=true;
     this.draw(performance.now());return this;
   }
-  update(params){this.params={...this.params,...params};}
+  update(params,emotion=null){this.params={...this.params,...params};if(emotion)this.emotion=emotion;}
   setMotion(enabled){this.enabled=Boolean(enabled);this.draw(performance.now());}
   /** The speechSynthesis API does not expose synthesized PCM, so this is a rhythm estimate. */
   setSpeaking(value,text=''){
@@ -36,6 +37,7 @@ export class RasterFaceRig {
   }
   setSpeechBoundary(index){if(this.voice.mode==='tts')this.voice.wordIndex=Math.max(0,Math.floor(index));}
   setMicrophone(mic){this.mic=mic;}
+  winkEye(side='eye_left'){if(!['eye_left','eye_right'].includes(side))return false;this.forceEye=null;this.winkState={side,started:performance.now()};return true;}
   setGaze(x,y){this.gaze.targetX=Math.max(-1,Math.min(1,x));this.gaze.targetY=Math.max(-1,Math.min(1,y));}
   setTestPose({eye=null,mouth=null,viseme='a'}={}){this.forceEye=eye;this.forceMouth=mouth;this.forceViseme=viseme;this.draw(performance.now());}
   start(){if(this.frame||!this.ready)return;const loop=t=>{this.draw(t);this.frame=requestAnimationFrame(loop);};this.frame=requestAnimationFrame(loop);}
@@ -47,18 +49,20 @@ export class RasterFaceRig {
     this.gaze.x+=(this.gaze.targetX-this.gaze.x)*Math.min(1,delta*6);
     this.gaze.y+=(this.gaze.targetY-this.gaze.y)*Math.min(1,delta*6);
     ctx.clearRect(0,0,1024,1536);ctx.drawImage(this.parts.base,0,0);
-    const blink=this.forceEye!==null?clamp01(this.forceEye):(active?irregularBlink(t-this.started):1);
-    const openness=eyeScale(p.eyeOpen,blink);
+    const winkProgress=this.winkState&&active ? winkEnvelope(t-this.winkState.started) : 0;
+    if(this.winkState&&t-this.winkState.started>850)this.winkState=null;
+    const gaze=eyeOffsetsFromGaze(this.gaze.x,this.gaze.y);
     for(const side of ['eye_left','eye_right']){
+      const blink=this.forceEye!==null?clamp01(this.forceEye):(active?blinkForSide(t-this.started,side):1);
+      const wink=side===this.winkState?.side?winkProgress:0;
+      const openness=eyePose({emotionEye:p.eyeOpen,smile:p.smile,browTension:p.browTension,blink,wink,side,emotion:this.emotion});
       const [x,y,x2,y2]=PART_BOXES[side],w=x2-x,h=y2-y;
-      const cx=(x+x2)/2,cy=(y+y2)/2, eyelashCentre=cy-5;
-      // The full-eye images remain their authentic painted eye art.
-      // The blink shrinks locally and a soft drawn lash closes over them.
-      const alpha=smootherstep((openness-.04)/.30);
-      ctx.save();ctx.globalAlpha=alpha;
-      ctx.drawImage(this.parts[side],x+this.gaze.x*2.3,eyelashCentre-(h*openness)/2+this.gaze.y*1.2,w,h*openness);
+      const cy=(y+y2)/2,eyelashCentre=cy-5;
+      ctx.save();ctx.globalAlpha=eyeArtOpacity(openness);
+      ctx.drawImage(this.parts[side],x+gaze.x,eyelashCentre-(h*openness)/2+gaze.y,w,h*openness);
       ctx.restore();
-      if(openness<.24)drawEyelid(ctx,side,smootherstep((.24-openness)/.18));
+      const lidAlpha=eyeLidOpacity(openness);
+      if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_closed`],x,y,w,h);ctx.restore();}
     }
     drawBlush(ctx,p.blush);
     let viseme='a',targetVoice=0;

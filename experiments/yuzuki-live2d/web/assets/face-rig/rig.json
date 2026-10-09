@@ -13,7 +13,7 @@
         555
       ],
       "centre": [
-        403.0,
+        403,
         507.5
       ],
       "canvas_box": [
@@ -31,7 +31,7 @@
         540
       ],
       "centre": [
-        623.0,
+        623,
         487.5
       ],
       "canvas_box": [
@@ -49,7 +49,7 @@
         656
       ],
       "centre": [
-        516.0,
+        516,
         631.5
       ],
       "canvas_box": [
@@ -60,5 +60,28 @@
       ]
     }
   },
-  "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD"
+  "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD",
+  "version": "0.6.0",
+  "additional_artwork": {
+    "eye_left_closed": {
+      "file": "eye_left_closed.svg",
+      "box": [
+        338,
+        460,
+        468,
+        555
+      ],
+      "use": "opacity blended unilateral eyelid"
+    },
+    "eye_right_closed": {
+      "file": "eye_right_closed.svg",
+      "box": [
+        551,
+        435,
+        695,
+        540
+      ],
+      "use": "opacity blended unilateral eyelid"
+    }
+  }
 }
