@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#edf1fa"><title>柚希 · 网页挂件</title>
+<link rel="stylesheet" href="./widget.css"><script type="module" src="./js/widget.js"></script>
+</head>
+<body>
+  <main class="widget" id="widget" aria-label="柚希互动角色挂件">
+    <div class="sparkle one">✦</div><div class="sparkle two">✧</div>
+    <div class="character" id="character" role="img" aria-label="会眨眼、能表达情绪的柚希">
+      <canvas id="widgetRig" width="1024" height="1536"></canvas>
+      <img id="widgetFallback" src="./assets/yuzuki-front-a.webp" alt="柚希的角色立绘">
+    </div>
+    <div class="bubble" id="widgetBubble" aria-live="polite">你好呀。今天也一起度过美好时光吧 ♡</div>
+    <div class="controls">
+      <button type="button" id="widgetHello" aria-label="和柚希打招呼" title="打个招呼">♡</button>
+      <button type="button" id="widgetWink" aria-label="让柚希眨眼" title="眨眨眼">✧</button>
+    </div>
+    <span class="model-label">YUZUKI · 2D RASTER</span>
+  </main>
+</body>
+</html>

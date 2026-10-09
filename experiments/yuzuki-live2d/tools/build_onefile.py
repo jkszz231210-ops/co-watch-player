@@ -64,4 +64,52 @@ const exports={};__instances__.set(name,exports);loader(__require__,exports);ret
     print(f'Created {TARGET.name} ({TARGET.stat().st_size/1024/1024:.2f} MiB; {len(assets)} face sprites)')
     return TARGET
 
-if __name__=='__main__':build()
+
+WIDGET_MODULES=['face-performance','eye-aperture','eye-performance','performance-timeline',
+                'facial-art','character-engine','raster-face-rig','widget-protocol','widget']
+
+def build_widget():
+    """Self-contained independently embeddable widget with the existing approved rig."""
+    html=(WEB/'widget.html').read_text('utf-8')
+    style=(WEB/'widget.css').read_text('utf-8')
+    source=(WEB/'assets/yuzuki-front-a.webp').read_bytes()
+    portrait='data:image/webp;base64,'+base64.b64encode(source).decode()
+    assets={}
+    for name in ['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris',
+                 'eye_right_iris','brow_left','brow_right','mouth',
+                 'eye_left_soft_closed','eye_right_soft_closed','eye_left_fold',
+                 'eye_right_fold','eye_left_lashes','eye_right_lashes']:
+        f=WEB/'assets/face-rig'/f'{name}.webp'
+        assets[f'assets/face-rig/{name}.webp']='data:image/webp;base64,'+base64.b64encode(f.read_bytes()).decode()
+    html=html.replace('<link rel="stylesheet" href="./widget.css">','<style>'+style+'</style>')
+    html=html.replace('<script type="module" src="./js/widget.js"></script>','')
+    html=html.replace('src="./assets/yuzuki-front-a.webp"','src="'+portrait+'"')
+    code="const __modules__=new Map(),__instances__=new Map();\nfunction __define__(name, factory){__modules__.set(name,factory)}\nfunction __require__(name){if(__instances__.has(name))return __instances__.get(name);const loader=__modules__.get(name);if(!loader)throw Error('Missing module: '+name);const exports={};__instances__.set(name,exports);loader(__require__,exports);return exports;}\n"
+    code+='window.__YUZUKI_OFFLINE_ASSETS='+json.dumps(assets,ensure_ascii=False)+';\n'
+    for module in WIDGET_MODULES:code+=compile_module(module)+'\n'
+    code+="__require__('widget');\n"
+    html=html.replace('</body>','<script>'+code.replace('</script','<\\/script')+'</script>\n</body>')
+    target=ROOT/'柚希-悬浮挂件.html'
+    target.write_text(html,'utf-8')
+    return target
+
+def build_embed_demo(widget_path=None):
+    """Single self-contained host site; the character runs inside an isolated srcdoc frame."""
+    widget_path=widget_path or build_widget()
+    html=(WEB/'demo-embed.html').read_text('utf-8')
+    widget=widget_path.read_text('utf-8')
+    loader=(WEB/'js/embed-loader.js').read_text('utf-8')
+    # Preserve the entire inline widget document as a JS string; no remote fetch.
+    literal=json.dumps(widget,ensure_ascii=False).replace('</script','<\\/script')
+    html=html.replace('<script src="./js/embed-loader.js"></script>',
+                      '<script>window.__YUZUKI_STANDALONE_WIDGET_HTML='+literal+';</script><script>'+loader+'</script>')
+    html=html.replace('YuzukiEmbed.mount({onEvent:',
+                      'YuzukiEmbed.mount({srcdoc:window.__YUZUKI_STANDALONE_WIDGET_HTML,onEvent:')
+    target=ROOT/'柚希-网页嵌入演示.html'
+    target.write_text(html,'utf-8')
+    return target
+
+if __name__=='__main__':
+    build()
+    print('Created',build_widget().name)
+    print('Created',build_embed_demo().name)

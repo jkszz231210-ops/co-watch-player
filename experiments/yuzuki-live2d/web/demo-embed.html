@@ -1,0 +1,14 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>柚希 · 网页嵌入演示</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5fb;color:#344a66;font-family:'Segoe UI','Microsoft YaHei',sans-serif}header{background:white;border-bottom:1px solid #e0e7f2;padding:20px clamp(20px,6vw,80px);display:flex;justify-content:space-between;align-items:center}header strong{font-size:18px}header small{color:#8498b6}main{max-width:990px;padding:46px 30px;margin:auto}h1{font-size:clamp(28px,5vw,45px);letter-spacing:.5px}h1 span{color:#7195c9}p{line-height:1.9;color:#6d829d}.panel{max-width:675px;background:white;padding:24px;border:1px solid #e2e9f3;border-radius:18px;box-shadow:0 15px 30px #344a6610}button{border:0;background:#6388b7;color:white;padding:12px 17px;border-radius:12px;cursor:pointer;margin:8px 7px 0 0}button.secondary{background:#e4ebf5;color:#5e799d}button:focus-visible{outline:3px solid #1e5ba9}code{background:#e7edf6;border-radius:7px;padding:2px 5px}.note{margin-top:30px;font-size:12px}footer{text-align:center;color:#9bacbc;padding:30px}@media(max-width:720px){main{padding:25px 20px}.panel{padding:18px}main{padding-bottom:430px}}
+</style></head><body><header><strong>✧ A Quiet Afternoon</strong><small>Yuzuki Embed Demonstration</small></header>
+<main><h1>把柚希带到<span>你的网页</span> ♡</h1><p>这是一个独立的普通网页。柚希通过隔离的 iframe 挂件出现在右下角，不需要重新实现角色动画，也不会改写原页面布局。</p>
+<section class="panel"><h2>和她互动</h2><p>以下按钮由<strong>宿主页面</strong>直接发送指令：切换表情、让角色展示文字、关闭或重新打开。原页面与角色引擎各自独立。</p>
+<button type="button" id="compliment">夸夸柚希</button><button type="button" id="comfort">让她安慰我</button><button type="button" id="celebrate">分享好消息</button><button type="button" class="secondary" id="toggle">隐藏 / 显示柚希</button><p id="feedback" aria-live="polite">角色正在加载……</p></section>
+<p class="note">本版本是有独立眉眼嘴层的二维栅格角色，不是 Cubism .moc3。你也可以将 <code>widget.html</code> 与 <code>embed-loader.js</code> 放入自己的网站。</p></main><footer>柚希 · 网页陪伴演示 V1.2</footer>
+<script src="./js/embed-loader.js"></script><script>
+const widget=YuzukiEmbed.mount({onEvent:e=>{if(e.event==='ready')document.querySelector('#feedback').textContent='柚希已经来到网页啦！';}});
+document.querySelector('#compliment').onclick=()=>widget.say('欸……突然这样夸我，好害羞呀。♡','shy');
+document.querySelector('#comfort').onclick=()=>widget.say('不着急。我陪你慢慢来，好吗？','comfort');
+document.querySelector('#celebrate').onclick=()=>widget.say('真棒！今天值得好好开心一下！✧','joy');
+document.querySelector('#toggle').onclick=()=>{if(widget.root.hidden)widget.show();else widget.hide();};
+</script></body></html>
