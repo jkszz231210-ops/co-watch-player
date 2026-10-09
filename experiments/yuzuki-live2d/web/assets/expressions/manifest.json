@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "平静",
+    "file": "01.webp"
+  },
+  {
+    "id": 2,
+    "name": "微笑",
+    "file": "02.webp"
+  },
+  {
+    "id": 3,
+    "name": "开心",
+    "file": "03.webp"
+  },
+  {
+    "id": 4,
+    "name": "暖暖",
+    "file": "04.webp"
+  },
+  {
+    "id": 5,
+    "name": "害羞",
+    "file": "05.webp"
+  },
+  {
+    "id": 6,
+    "name": "疑惑",
+    "file": "06.webp"
+  },
+  {
+    "id": 7,
+    "name": "小得意",
+    "file": "07.webp"
+  },
+  {
+    "id": 8,
+    "name": "小生气",
+    "file": "08.webp"
+  },
+  {
+    "id": 9,
+    "name": "认真",
+    "file": "09.webp"
+  },
+  {
+    "id": 10,
+    "name": "温柔",
+    "file": "10.webp"
+  },
+  {
+    "id": 11,
+    "name": "委屈",
+    "file": "11.webp"
+  },
+  {
+    "id": 12,
+    "name": "惊讶",
+    "file": "12.webp"
+  },
+  {
+    "id": 13,
+    "name": "困倦",
+    "file": "13.webp"
+  },
+  {
+    "id": 14,
+    "name": "放空",
+    "file": "14.webp"
+  },
+  {
+    "id": 15,
+    "name": "安慰",
+    "file": "15.webp"
+  },
+  {
+    "id": 16,
+    "name": "沉思",
+    "file": "16.webp"
+  }
+]
