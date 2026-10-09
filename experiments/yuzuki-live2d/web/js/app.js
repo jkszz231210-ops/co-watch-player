@@ -38,7 +38,16 @@ $('mouthTest').addEventListener('click',()=>trial({mouth:.8,viseme:'a'},700));
 $('winkLeftTest').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});rig.winkEye('eye_left');});
 $('winkRightTest').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});rig.winkEye('eye_right');});
 for(const button of document.querySelectorAll('[data-viseme]'))button.addEventListener('click',()=>trial({mouth:.85,viseme:button.dataset.viseme},900));
-$('restorePose').addEventListener('click',()=>{clearTimeout(trialTimer);rig.setTestPose({eye:null,mouth:null});});
+const eyelidSlider=$('lidSlider'),eyelidValue=$('lidValue');
+eyelidSlider.addEventListener('input',()=>{
+ clearTimeout(trialTimer);const value=Number(eyelidSlider.value)/100;
+ eyelidValue.textContent=`${Math.round(value*100)}%`;
+ rig.setTestPose({eye:value,mouth:null});
+});
+$('restorePose').addEventListener('click',()=>{
+ clearTimeout(trialTimer);eyelidSlider.value='100';eyelidValue.textContent='100%';
+ rig.setTestPose({eye:null,mouth:null});
+});
 const microphoneButton=$('microphoneMouth'),audioStatus=$('audioStatus');
 microphoneButton.addEventListener('click',async()=>{
  microphoneButton.disabled=true;
@@ -50,7 +59,7 @@ microphoneButton.addEventListener('click',async()=>{
 });
 $('faceSnapshot').addEventListener('click',()=>{
  if(!rig.ready){audioStatus.textContent='正在加载角色素材，稍后再试。';return;}
- const link=document.createElement('a');link.download='Yuzuki-v0.7-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
+ const link=document.createElement('a');link.download='Yuzuki-v0.8-frame.png';link.href=rig.canvas.toDataURL('image/png');document.body.append(link);link.click();link.remove();
 });
 // Pointer-follow is subtle and can be switched off through the motion control.
 $('stage').addEventListener('pointermove',event=>{

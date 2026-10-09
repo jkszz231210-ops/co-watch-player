@@ -1,4 +1,4 @@
-# 柚希 · Yuzuki V0.7 — 虹膜与眉毛独立控制的面部动画原型
+# 柚希 · Yuzuki V0.8 — 眼睑遮挡与睫毛前景的面部动画原型
 
 > 目标：创造一位**可爱、温柔陪伴、清冷知性、灵动、略带梦幻感**的日系精致动画风虚拟角色，让美术、表情、声音与对话成为一体，并可复用于网页、桌面与其他应用。
 
@@ -10,13 +10,22 @@
 - **默认展示**：`web/index.html` 永远使用这张图，不受旧浏览器评分缓存影响。
 - **无须反复确认**：已定稿的审美不再设为生产前置条件；`web/review.html` 仅在主动提出修改时使用。
 - **后续重点**：先完成可复用、可测试的真实渲染与美术资产，再把成果交由用户审核。
-- **事实边界**：本版本已有独立眼睛和嘴部的真实透明图层，以及可在 Krita/GIMP 编辑的 `.ora` 工程；仍不是经过画师精修的分层 PSD 或 Cubism 绑定模型。
+- **事实边界**：本版本已有独立眼睛、虹膜、睫毛、眉毛和嘴部的试验透明图层，以及可在 Krita/GIMP 编辑的 `.ora` 工程；仍不是经过画师精修的分层 PSD 或 Cubism 绑定模型。
+
+## V0.8 实际新增（2026-10-09）
+
+- **不再挤扁虹膜眨眼**：眼球与睫毛保持原比例，使用双侧眼角收拢的贝塞尔曲线眼睑遮罩逐步遮盖眼睛。
+- **新增睫毛前景图层**：在原有分层基础上单独提取左右睫毛；现在共有 **12 层可编辑 OpenRaster**，不是正式 Cubism 模型。
+- **眼睑连续试镜**：网页「动作参数」中新增开合 0–100% 滑条，一眼即可看出哪些闭合阶段需要美术修复。
+- **极轻微二维倾身**：让情绪姿态真正影响视觉展示；这**不是**头部 XY 转向。
+- **可直接看效果**：[八种眼睑状态检查](assets/face-rig/qa-aperture-v08.jpg)、[动态 GIF](assets/face-rig/yuzuki-lid-v08.gif)，均是 **Pillow 离线生成**而非浏览器实拍。
+- 重建步骤、技术边界和后续精修清单：[`docs/15-eyelid-occlusion-v08.md`](docs/15-eyelid-occlusion-v08.md)。
 
 ## V0.7 实际新增（2026-10-09）
 
 **核心升级：眼睛不再整块跟着视线位移。** 新增左右虹膜、眼白/固定眼线、左右眉毛独立纹理，允许极小幅注视与眉毛情绪动作。保留原有脸部、眨眼、单眼 Wink、5 种嘴型、麦克风功能，发布 10 层 OpenRaster 试验素材。
 
-- 查看 [六种虹膜/眉毛状态对照](assets/face-rig/qa-eye-detail-v07.jpg) 与 [虹膜注视短动画](assets/face-rig/yuzuki-iris-gaze-v07-compact.gif)。这两者是离线素材合成，不是实时浏览器录像。
+- 查看 [六种虹膜/眉毛状态对照](assets/face-rig/qa-eye-detail-v07.jpg) 与 [虹膜注视短动画](assets/face-rig/yuzuki-iris-gaze-v07.gif)。这两者是离线素材合成，不是实时浏览器录像。
 - 在网页「动作参数」点击“看向左边 / 看向右边 / 恢复视线”，也可在角色区域内移动鼠标。
 - 要重建素材，查看 [V0.7 图层生产与局限](docs/14-iris-eyebrows-v07.md)，执行 `tools/build_eye_detail_v07.py`。
 - **限制**：由于刘海挡住部分眉毛，现阶段自动分层并非最终画师级 PSD，尚未完成 Cubism 导入；全页面 Chromium 自动测试受到环境阻止。
@@ -72,11 +81,11 @@ Windows 下双击 `一键体验柚希.cmd`，进入网页点击「动作参数�
 | 角色设定板 | ✅ 概念稿 | 表情、三视图、服装、分层意向图。**其中 PSD 和目录截图只是绘制示意** |
 | 16 种表情参考 | ✅ 静态素材 | 从概念板裁切，仅作为美术与情绪参考，不是独立可变形图层 |
 | 网页交互实验室 | ✅ 代码完成 | 两眼/嘴分层、口型 A/I/U/E/O、麦克风响度驱动、文本节奏估计、16 态参数和情绪演出（浏览器图形验收待复核） |
-| OpenRaster 透明分层 | ✅ 试验可编辑 | 完整 ZIP 中 `assets/face-rig/yuzuki-facial-prototype-v07.ora` V0.7 共有 10 层：修复底图、左右眉、左右虹膜、左右眼白、嘴部和两条闭眼线。GitHub 端按 `build_face_rig.py` → `build_eyelid_layers.py` → `build_eye_detail_v07.py` 顺序重建。**不是正式高精 PSD。** |
+| OpenRaster 透明分层 | ✅ 试验可编辑 | 完整 ZIP 中 `assets/face-rig/yuzuki-facial-prototype-v08.ora` V0.8 共有 12 层：修复底图、左右眉、左右虹膜、左右眼白、嘴部和两条闭眼线。GitHub 端通过 `tools/build_face_rig.py` → `tools/build_eyelid_layers.py` → `tools/build_eye_detail_v07.py` → `tools/build_eye_lashes_v08.py` 重建。**不是正式高精 PSD。** |
 | 离线动画预览 | ✅ 已生成 | `assets/face-rig/yuzuki-face-motion-preview.gif`，可无需运行服务查看 |
 | **美术审核台** | ✅ 代码完成 | 三套候选、并排对比、6 项打分、浏览器本地保存、导出 JSON |
 | 行为引擎 | ✅ 原型 | 与渲染器分离的情绪→参数映射，包含单元测试 |
-| 正式分层 PSD | ⏳ 待精修 | 现已有 6 层 ORA 试验稿，尚需手工补绘眉眼口及头发遮挡、独立睫毛/虹膜等部件 |
+| 正式分层 PSD | ⏳ 待精修 | 现已有 12 层 ORA 试验稿，尚需手工补绘眉眼口及头发遮挡、独立睫毛/虹膜等部件 |
 | Cubism 源模型 `.cmo3` | ⏳ 待绑定 | 无法用一张图片自动替代建模工作 |
 | 可运行 Live2D `.moc3` / `.model3.json` | ⏳ 待导出 | 需要 Cubism Editor 导出并检查物理、表情、动作 |
 | 真正的 AI 对话 / 实时语音 | ⏳ 待接入 | 当前是本地关键词应答，浏览器 TTS 与有条件语音输入 |
@@ -127,7 +136,7 @@ yuzuki-live2d/
 ├── LICENSE-CODE.md
 ├── assets/
 │   ├── source/                  # 生成的高清原始概念图（不可视为 PSD）
-│   ├── face-rig/                 # 可编辑 6 层 OpenRaster / 视觉 QA / GIF
+│   ├── face-rig/                 # 可编辑 12 层 OpenRaster / 视觉 QA / GIF
 │   └── psd-workspace/           # 图层交付结构说明与验收表
 ├── docs/
 │   ├── 01-character-bible.md    # 人设、五官、发型、服装、配色

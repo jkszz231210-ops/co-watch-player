@@ -61,7 +61,7 @@
     }
   },
   "status": "EXPERIMENTAL_AUTO_EXTRACTED_NOT_FINAL_PSD",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "additional_artwork": {
     "eye_left_closed": {
       "file": "eye_left_closed.webp",
@@ -84,11 +84,12 @@
       "use": "opacity-weighted wink/blink closure"
     }
   },
-  "prototype_source": "assets/face-rig/yuzuki-facial-prototype-v07.ora",
+  "prototype_source": "assets/face-rig/yuzuki-facial-prototype-v08.ora",
   "limitations": [
-    "Brow line extraction is retouched from original; bang occlusion needs painter cleanup",
-    "Iris only moves 1-3px; no eye-geometry or Cubism warp",
-    "Not a Cubism PSD, Cubism .cmo3 or runtime .moc3"
+    "Painted eyelashes are extracted from source, not hand-repainted geometry",
+    "No high-quality eye occlusion at extreme glances; gaze limited to <=3px",
+    "Only slight 2D lean, not head XY rotation or Cubism deformers",
+    "No Cubism PSD, .cmo3, or .moc3"
   ],
   "iris_centres": {
     "eye_left": [
@@ -122,5 +123,10 @@
     "eye_right_iris.webp",
     "brow_left.webp",
     "brow_right.webp"
-  ]
+  ],
+  "eyelash_foreground": {
+    "eye_left": "eye_left_lashes.webp",
+    "eye_right": "eye_right_lashes.webp"
+  },
+  "blink_method": "Unscaled eye sprites + cubic bezier lid aperture + hidden closed-line artwork"
 }

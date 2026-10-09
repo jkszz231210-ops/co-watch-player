@@ -4,8 +4,9 @@
  */
 import {irregularBlink,eyeScale,resolveLip,clamp01,textVisemeAt} from './face-performance.js';
 import {drawBlush,drawLips} from './facial-art.js';
-import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,eyeOffsetsFromGaze,winkEnvelope,browYOffset,irisOffset} from './eye-performance.js';
-export const RIG_VERSION='0.7.0';
+import {blinkForSide,eyePose,eyeLidOpacity,eyeArtOpacity,winkEnvelope,browYOffset,irisOffset} from './eye-performance.js';
+import {eyelidAperture,traceAperture,paintMovingLid} from './eye-aperture.js';
+export const RIG_VERSION='0.8.0';
 export const PART_BOXES={eye_left:[338,460,468,555],eye_right:[551,435,695,540],mouth:[468,607,564,656]};
 // Back-compatible QA helpers.
 export const smootherstep=x=>{const v=clamp01(x);return v*v*(3-2*v);};
@@ -23,7 +24,7 @@ export class RasterFaceRig {
     this.smoothedVoice=0;this.lastTime=0;this.emotion='calm';this.winkState=null;
   }
   async load(){
-    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_closed','eye_right_closed'];
+    const names=['base_v07','eye_left_sclera','eye_right_sclera','eye_left_iris','eye_right_iris','brow_left','brow_right','mouth','eye_left_closed','eye_right_closed','eye_left_lashes','eye_right_lashes'];
     const loaded=await Promise.all(names.map(name=>getImage(`${this.assetRoot}/${name}${name.endsWith('_closed')?'.svg':'.webp'}`)));
     names.forEach((name,i)=>this.parts[name]=loaded[i]);this.ready=true;
     this.draw(performance.now());return this;
@@ -63,13 +64,17 @@ export class RasterFaceRig {
       const wink=side===this.winkState?.side?winkProgress:0;
       const openness=eyePose({emotionEye:p.eyeOpen,smile:p.smile,browTension:p.browTension,blink,wink,side,emotion:this.emotion});
       const [x,y,x2,y2]=PART_BOXES[side],w=x2-x,h=y2-y;
-      const cy=(y+y2)/2,eyelashCentre=cy-5;
+      const shape=eyelidAperture(side,openness);
+      // Keep iris and sclera at their painted dimensions. An eye-shaped
+      // aperture clips both instead of crushing the pupil during blinking.
       ctx.save();ctx.globalAlpha=eyeArtOpacity(openness);
-      const top=eyelashCentre-(h*openness)/2;
-      // Draw repaired sclera and painted eyeliner at a fixed position. Only the iris art follows gaze.
-      ctx.drawImage(this.parts[`${side}_sclera`],x,top,w,h*openness);
-      ctx.drawImage(this.parts[`${side}_iris`],x+gaze.x,top+gaze.y*openness,w,h*openness);
+      if(openness<.96){traceAperture(ctx,shape);ctx.clip();}
+      ctx.drawImage(this.parts[`${side}_sclera`],x,y,w,h);
+      ctx.drawImage(this.parts[`${side}_iris`],x+gaze.x,y+gaze.y,w,h);
+      // Lashes are in the foreground. This preserves the original ink edge.
+      ctx.drawImage(this.parts[`${side}_lashes`],x,y,w,h);
       ctx.restore();
+      if(openness<.95&&openness>.19)paintMovingLid(ctx,shape);
       const lidAlpha=eyeLidOpacity(openness);
       if(lidAlpha>.001){ctx.save();ctx.globalAlpha=lidAlpha;ctx.drawImage(this.parts[`${side}_closed`],x,y,w,h);ctx.restore();}
     }

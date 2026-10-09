@@ -5,3 +5,9 @@
 
 /* V0.4: independent facial layer renderer. */
 .face-rig-canvas{display:block}.rig-trials{margin-top:20px;border-top:1px solid #e5ebf5;padding-top:18px;color:#7285a8;font-size:12px}.rig-trials strong{display:block;margin-bottom:10px}.rig-trials p{color:#9ba9c1;font-size:11px;line-height:1.8}.trial-buttons{display:flex;gap:8px;flex-wrap:wrap}.trial-buttons button{flex:1;min-width:94px}.reduced-motion .face-rig-canvas{will-change:auto}
+
+/* V0.8: tiny 2-D lean, deliberately NOT an X/Y head turn. */
+.character-art{transform-origin:50% 40%;transform:rotate(var(--emotion-tilt,0deg)) scale(1.035);transition:transform .78s cubic-bezier(.18,.73,.26,1)}
+.reduced-motion .character-art{transform:none;transition:none}
+
+.eyelid-scrubber{margin:14px 0 10px;padding:11px 13px;border:1px solid #e0e6f2;background:#f8faff;border-radius:12px}.eyelid-scrubber label{display:flex;justify-content:space-between;color:#7183a8;font-size:12px;margin-bottom:8px}.eyelid-scrubber input{width:100%;accent-color:#8096c0;cursor:pointer}
